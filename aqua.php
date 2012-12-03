@@ -214,23 +214,20 @@ if ( ! exists( 'params' ) ) {
 if ( ! exists( 'hasher' ) ) {
     function hasher () {
         # return a new data() method tied to a fresh hash
-        return function ( $key = null, $value = null ) {
+        return function ( $key = null, $value = '' ) {
 
             static $hash;  # php.net/manual/en/language.variables.scope.php
             isset( $hash ) or $hash = array();
-            
-            if ( \func_num_args() > 1 )
-                return $hash[ $key ] = $value; # set
+                
+            if ( \is_scalar($key) )
+                return 1 == \func_num_args() ? $hash[ $key ] # get
+                    : ( $hash[ $key ] = $value );            # set
 
-            if ( \is_scalar($key) ) 
-                return $hash[ $key ];          # get
-                
-            if ( null === $key )
-                return $hash;                  # get all
-                
-            foreach ( $key as $k => $v )       # set multi
-                $hash[ $k ] = $v;
-            return $hash; 
+            if ( $key )
+                foreach ( $key as $k => $v )    # set multi
+                    $hash[ $value . $k ] = $v;  # $value becomes opt_prefix
+
+            return $hash; # get all
         };
     }
 }
@@ -269,6 +266,44 @@ if ( ! exists( 'uris' ) ) {
     }
 }
 
+/**
+ * Add or remove actions.
+ */
+if ( ! exists( 'action' ) ) {
+    function action ( $key = null, $callback = null, $op = null ) {
+    
+        static $hash;
+        isset( $hash ) or $hash = array();
+        
+        if ( \is_scalar($key) ) {
+            $hash[ $key ] or $hash[ $key ] = array();
+            if ( 1 == \func_num_args() )
+                foreach ( $hash[ $key ] as $fn ) # fire
+                    $fn and \call_user_func($fn);
+            elseif ( false === $callback ) # remove all
+                unset( $hash[ $key ] );
+            elseif ( \is_array($callback) )
+                $hash[ $key ] = \array_merge( $hash[ $key ], \array_values($callback) );
+            elseif ( ! $hash[ $key ] ) # set
+                false === $op or $hash[ $key ] = array( $callback );
+            elseif ( 0 === $op )       # set 
+                \array_unshift( $hash[ $key ], $callback );
+            elseif ( false !== $op )   # set 
+                $hash[ $key ][] = $callback;
+            elseif ( $hash[ $key ] )
+                foreach ( $hash[ $key ] as $i => $fn ) # remove
+                    if ( $fn === $callback ) 
+                        unset ( $hash[ $key ][ $i ] );
+
+        } elseif ( $key ) {
+            foreach ( $key as $k => $v )    # set multi
+                action( $k, $v, $value );
+        }
+
+        return $hash; # get all
+    }
+}
+
 if ( ! exists( 'run' ) ) {
     function run ( $params = null ) {
 
@@ -291,8 +326,6 @@ if ( ! exists( 'run' ) ) {
         
         if ( ! \is_readable($params->file) )
             return;
-
-
         
         # canonical url to current content
         $uris->url = slash_join( $uris->root, $params->path );
