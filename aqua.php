@@ -126,10 +126,10 @@ if ( ! exists( '\\load_json' ) ) {
 }
 
 if ( ! exists( '\\insert_data' ) ) {
-    function insert_data ( $html, $data ) {
+    function insert_data ( $html, $data, $prefix = '' ) {
         if ( $html && $data )
             foreach ( $data as $k => $v )
-                $html = \str_replace( '{{' . $k . '}}', $v, $html );
+                $html = \str_replace( '{{' . $prefix . $k . '}}', $v, $html );
         return $html;
     }
 }
@@ -355,6 +355,9 @@ if ( ! exists( 'run' ) ) {
                 }
             }
         }
+        
+        # store the data to the hash for access from views
+        data( $data );
 
         if ( isset( $data->order ) ) {
 
@@ -373,10 +376,12 @@ if ( ! exists( 'run' ) ) {
             
             $html = insert_data( $html, array('feed' => $feed) );
             $html = insert_data( $html, $data );
+            $html = insert_data( $html, $uris, 'uri.' );
 
         } else {
             $html = load_html( locate_file( $paths->views, "singular-{$data->type}.php", 'singular.php' ) );
             $html = insert_data( $html, $data );
+            $html = insert_data( $html, $uris, 'uri.' );
         }
 
         echo $html;
