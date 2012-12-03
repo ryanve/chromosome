@@ -2,9 +2,8 @@
 namespace aqua;
 
 /**
- * aqua.php   Aqua is an experimental PHP MVC framework where
- *            where content data is stored in JSON files. It
- *            is designed to be extremely light and flexible.
+ * aqua.php   Aqua is a PHP template engine that generates views
+ *            based on content data stored in JSON files.
  * @link      http://github.com/ryanve/aqua
  * @author    Ryan Van Etten <@ryanve>
  * @version   0.x
@@ -37,6 +36,12 @@ if ( ! \function_exists( __NAMESPACE__ . '\\ns' ) ) {
 if ( ! \function_exists( __NAMESPACE__ . '\\exists' ) ) {
     function exists ( $name, $what = 'function' ) {
         return \call_user_func( $what . '_exists', ns($name) );
+    }
+}
+
+if ( ! \function_exists( __NAMESPACE__ . '\\e' ) ) {
+    function e ( $str ) {
+        echo $str;
     }
 }
 
