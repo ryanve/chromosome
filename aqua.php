@@ -77,7 +77,7 @@ if ( ! exists( '\\to_uri' ) ) {
     }
 }
 
-if ( ! exists( '\\locate_file' ) ) {
+if ( ! exists( '\\json_update' ) ) {
     function json_update ( $path, $callback ) {
 
         $data = \file_exists( $path ) ? \file_get_contents( $path ) : '';
