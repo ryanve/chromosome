@@ -1,7 +1,7 @@
 [aqua](http://github.com/ryanve/aqua)
 ====
 
-an experimental PHP MVC framework where content data is stored in JSON files
+an experimental PHP template engine that generates views based on content data stored in JSON files
 
 ### server setup
 
