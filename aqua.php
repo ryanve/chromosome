@@ -40,6 +40,28 @@ if ( ! \function_exists( __NAMESPACE__ . '\\exists' ) ) {
 }
 
 /**
+ * Call a namespaced function by name. ( Params can be supplied via extra args. )
+ * @param   string    $fname
+ */
+if ( ! exists( 'call' ) ) {
+    function call ( $fname ) {
+        $params = func_get_args();
+        return \call_user_func_array( ns( \array_shift($params) ), $params );
+    }
+}
+
+/**
+ * Call a namespaced function by name. ( Params can be supplied via array. )
+ * @param   string    $fname
+ * @param   array     $params
+ */
+if ( ! exists( 'apply' ) ) {
+    function apply ( $fname, $params = array() ) {
+        return \call_user_func_array( ns( $fname ), $params );
+    }
+}
+
+/**
  * @param   string   $str
  */
 if ( ! exists( 'e' ) ) {
@@ -135,13 +157,22 @@ if ( ! exists( 'json_update' ) ) {
  * @return  string|null
  */
 if ( ! exists( 'locate_file' ) ) {
-    function locate_file () {# $haystack_path, $needle1, $needle2 ...
-        $filenames = \func_get_args();
-        $dir = \array_shift( $filenames );
-        foreach ( $filenames as $filename ) {
-            $filename = slash_join($dir, $filename); # convert to path
-            if ( \file_exists($filename) )
-                return $filename; # full path to file
+    function locate_file ( $dir, $file, $types = null ) {# OR $dir, $needle1, $needle2 ...
+
+        if ( \is_array( $types ) ) {
+            $file = slash_join( $dir, $file );
+            $ext = '#(\.[a-z0-9]+)$#i';
+            foreach ( $types as $n )
+                if ( \file_exists( $n = \preg_replace( $ext, "-$n$1", $file ) ) )
+                    return $n;
+            return \file_exists($file) ? $file : null;
+
+        } else {
+            $filenames = \func_get_args();
+            $dir = \array_shift( $filenames );
+            foreach ( $filenames as $n )
+                if ( $n && \file_exists( $n = slash_join($dir, $n) ) )
+                    return $n;
         }
     }
 }
@@ -204,6 +235,50 @@ if ( ! exists( 'sanitize' ) ) {
 
         # remove entities, then octets, then anything not alphanumeric|underscore|space|dash
         return \preg_replace('/&.+?;|%([a-fA-F0-9][a-fA-F0-9])|[^\w\s-]/', '', $str);
+    }
+}
+
+# make it easy to print arrays to string
+if ( ! exists( 'ssv', 'class' ) ) {
+    class ssv {
+        function __construct ( $ssv = null ) {
+            $ssv = \is_string( $ssv ) ? \preg_split( '#\s+#', $ssv ) : $ssv;
+            foreach ( (array) $ssv as $k => $v )
+                \is_scalar($v) && \strlen($v = \trim($v)) and $this->{$k} = $v;
+        }
+        function __toString () {
+            return \implode( ' ', (array) $this );
+        }
+    }
+}
+
+/**
+ *
+ *
+ */
+if ( ! exists( 'ssv' ) ) {
+    function ssv ( $ssv = null ) {
+        return new ssv( $ssv );
+    }
+}
+
+if ( ! exists( 'shift' ) ) {
+    function shift ( $arr, $delim = ' ' ) {
+        if ( \is_scalar($arr) )
+            foreach ( (array) $delim as $i => $d )
+                $arr = \explode( $d, $i > 0 ? $arr[0] : $arr );
+        $arr = (array) $arr;
+        return $arr[0];
+    }
+}
+
+if ( ! exists( 'pop' ) ) {
+    function pop ( $arr, $delim = ' ' ) {
+        if ( \is_scalar($arr) )
+            foreach ( (array) $delim as $i => $d )
+                $arr = \explode( $d, $i > 0 ? \array_pop($arr) : $arr );
+        $arr = (array) $arr;
+        return \array_pop($arr);
     }
 }
 
@@ -343,7 +418,7 @@ if ( ! exists( 'paths' ) ) {
     function paths ( $key = null, $value = null ) {
         static $data;  # php.net/manual/en/language.variables.scope.php
         isset( $data ) or $data = hasher();
-        return \call_user_func_array( $data, func_get_args() );
+        return \call_user_func_array( $data, \func_get_args() );
     }
 }
 
@@ -354,7 +429,36 @@ if ( ! exists( 'uris' ) ) {
     function uris ( $key = null, $value = null ) {
         static $data;  # php.net/manual/en/language.variables.scope.php
         isset( $data ) or $data = hasher();
-        return \call_user_func_array( $data, func_get_args() );
+        return \call_user_func_array( $data, \func_get_args() );
+    }
+}
+
+/**
+ * Get or set URIs.
+ */
+if ( ! exists( 'options' ) ) {
+    function options ( $key = null, $value = null ) {
+        static $data;  # php.net/manual/en/language.variables.scope.php
+        isset( $data ) or $data = hasher();
+        return \call_user_func_array( $data, \func_get_args() );
+    }
+}
+
+/**
+ * 
+ */
+if ( ! exists( 'is_plural' ) ) {
+    function is_plural () {
+        return null !== data('order');
+    }
+}
+
+/**
+ * 
+ */
+if ( ! exists( 'is_type' ) ) {
+    function is_type ( $type ) {
+        return \in_array( $type, (array) data('type') );
     }
 }
 
@@ -445,8 +549,8 @@ if ( ! exists( 'run' ) ) {
 
         if ( isset( $data->order ) ) {
 
-            $html    = load_html( locate_file($paths->views, "archive-{$data->type}.php", 'archive.php') );
-            $article = load_html( locate_file($paths->views, "excerpt-{$data->type}.php", 'excerpt.php') );
+            $html    = load_html( locate_file($paths->views, 'archive.php', (array) $data->type) );
+            $article = load_html( locate_file($paths->views, 'excerpt.php', (array) $data->type) );
             $feed = '';
             $f = null;
 
@@ -470,7 +574,7 @@ if ( ! exists( 'run' ) ) {
             $html = insert_data( $html, $uris, 'uri.' );
 
         } else {
-            $html = load_html( locate_file( $paths->views, "singular-{$data->type}.php", 'singular.php' ) );
+            $html = load_html( locate_file( $paths->views, 'singular.php', (array) $data->type ) );
             $html = insert_data( $html, $data );
             $html = insert_data( $html, $uris, 'uri.' );
         }
@@ -517,49 +621,20 @@ if ( ! exists( 'fill_defaults' ) ) {
 }
 
 if ( ! exists( 'classes' ) ) {
-    function classes ( $extra = null ) {
-        $classes = data('class');
-        \is_string($classes) and $classes = \preg_split( '#\s+#', $classes );
-        \is_string($extra)   and $extra   = \preg_split( '#\s+#', $extra );
-        $classes = \array_merge( (array) $extra, (array) $classes );
-        # ( $year = data('pubyear') ) and $classes[] = 'y' . $year;
+    function classes ( $classes = null, $file = null ) {
+        $classes = (array) ssv( $classes );
+        $i = count( $classes );
+        foreach ( ssv( data('type') ) as $n )
+            $classes[ $i++ ] = 'type-' . $n;
+        foreach ( ssv( data('class') ) as $n )
+            $classes[ $i++ ] = $n;
+        #if ( $file ) {
+        #    $file = \basename( $file, '.php' );
+        #    $file and $classes[] = $file;
+        #}
         # $slug = basename( data('url') );
         # $slug and $classes[] = 'slug-' . $slug;
-        $classes = \array_filter( \array_unique( $classes ), 'strlen' );
-        return \implode( ' ', $classes );
-    }
-}
-
-if ( ! exists( 'classes_e' ) ) {
-    function classes_e ( $extra = null ) {
-        echo classes( $extra );
-    }
-}
-
-if ( ! exists( 'normalize_data' ) ) {
-    function normalize_data () {
-
-        $data = (array) data(); # get the current data
-        
-        foreach ( array( 'js', 'css', 'tags', 'class' ) as $n ) {
-            if ( null !== $data[$n] ) {
-                \is_string( $data[$n] ) and $data[$n] = \preg_split( '#\s+#', $data[$n] ); # ssv
-                \is_array( $data[$n] )  and $data[$n] = \array_unique( \array_filter( $data[$n], 'strlen' ) );
-            }
-        }
-
-        # convert class names to a string 
-        isset( $data['class'] ) and $data['class'] = \implode( ' ', $data['class'] );
-        
-        foreach ( array('pub', 'mod') as $n ) {
-            $datetime = $data[$n . 'date'];
-            if ( $datetime && ! $data[$n .= 'year'] ) {
-                $data[$n] = \array_shift( \explode( '-', (string) $datetime ) );
-                $data[$n] > 0 or $data[$n] = '';
-            }
-        }
-        
-        data( $data ); # update the current data (no need to update the json)
+        return data( 'class', ssv( \array_unique( $classes ) ) );
     }
 }
 
@@ -586,6 +661,86 @@ if ( ! exists( 'query' ) ) {
     }
 }
 
+# ECHOERS 
+
+if ( ! exists( 'esc_e' ) ) {
+    function esc_e () {
+        echo apply( 'esc', \func_get_args() );
+    }
+}
+
+if ( ! exists( 'data_e' ) ) {
+    function data_e () {
+        echo apply( 'data', \func_get_args() );
+    }
+}
+
+if ( ! exists( 'meta_e' ) ) {
+    function meta_e ( $name, $content ) {
+        echo apply( 'meta', \func_get_args() );
+    }
+}
+
+if ( ! exists( 'uris_e' ) ) {
+    function uris_e () {
+        echo apply( 'uris', \func_get_args() );
+    }
+}
+
+if ( ! exists( 'ssv_e' ) ) {
+    function ssv_e () {
+        echo apply( 'ssv', \func_get_args() );
+    }
+}
+
+if ( ! exists( 'classes_e' ) ) {
+    function classes_e () {
+        echo apply( 'classes', \func_get_args() );
+    }
+}
+
+if ( ! exists( 'shift_e' ) ) {
+    function shift_e () {
+        echo apply( 'shift', \func_get_args() );
+    }
+}
+
+if ( ! exists( 'pop_e' ) ) {
+    function pop_e () {
+        echo apply( 'pop', \func_get_args() );
+    }
+}
+
+# ACTIONS
+
+if ( ! exists( 'normalize_data' ) ) {
+    function normalize_data () {
+
+        $data = (array) data(); # get the current data
+        
+        foreach ( options('ssv_props') as $n ) {
+            if ( null !== $data[$n] ) {
+                \is_string( $data[$n] ) and $data[$n] = \preg_split( '#\s+#', $data[$n] ); # ssv
+                \is_array( $data[$n] )  and $data[$n] = \array_unique( \array_filter( $data[$n], 'strlen' ) );
+            }
+        }
+
+        # convert class names to a string 
+        isset( $data['class'] ) and $data['class'] = \implode( ' ', $data['class'] );
+        
+        foreach ( array('pub', 'mod') as $n ) {
+            $datetime = $data[$n . 'date'];
+            if ( $datetime && ! $data[$n .= 'year'] ) {
+                $data[$n] = \array_shift( \explode( '-', (string) $datetime ) );
+                $data[$n] > 0 or $data[$n] = '';
+            }
+        }
+        
+        data( $data ); # update the current data (no need to update the json)
+    }
+}
+
+options( 'ssv_props', array( 'js', 'css', 'tags', 'class', 'type' ) );
 action( 'update', ns( 'fill_defaults' ) );
 action( 'update', ns( 'normalize_data' ) );
 
