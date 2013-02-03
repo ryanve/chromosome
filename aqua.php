@@ -61,15 +61,6 @@ if ( ! exists( 'apply' ) ) {
     }
 }
 
-/**
- * @param   string   $str
- */
-if ( ! exists( 'e' ) ) {
-    function e ( $str ) {
-        echo $str;
-    }
-}
-
 if ( ! exists( 'lslash' ) ) {
     function lslash ( $s, $chars = '/' ) {
         return $chars . \ltrim( $s, $chars );
@@ -662,6 +653,15 @@ if ( ! exists( 'query' ) ) {
 }
 
 # ECHOERS 
+
+/**
+ * @param   string   $str
+ */
+if ( ! exists( 'e' ) ) {
+    function e ( $str ) {
+        echo $str;
+    }
+}
 
 if ( ! exists( 'esc_e' ) ) {
     function esc_e () {
