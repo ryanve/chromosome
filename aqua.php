@@ -10,8 +10,6 @@ namespace aqua;
  * @license   MIT
  */
 
-\file_exists( 'custom.php' ) and include_once( 'custom.php' );
-
 # CORE FUNCTIONS 
 
 /**
@@ -58,12 +56,6 @@ if ( ! exists( 'call' ) ) {
 if ( ! exists( 'apply' ) ) {
     function apply ( $fname, $params = array() ) {
         return \call_user_func_array( ns( $fname ), $params );
-    }
-}
-
-if ( ! exists( 'is_assoc' ) ) {
-    function is_assoc ( $item ) {
-        return !! $item && \is_array($item) && ! \ctype_digit( \implode( '', \array_keys($item) ) );
     }
 }
 
@@ -440,13 +432,28 @@ if ( ! exists( 'uris' ) ) {
 }
 
 /**
- * Get or set URIs.
+ * Get or set options.
  */
 if ( ! exists( 'options' ) ) {
     function options ( $key = null, $value = null ) {
         static $data;  # php.net/manual/en/language.variables.scope.php
         isset( $data ) or $data = hasher();
         return \call_user_func_array( $data, \func_get_args() );
+    }
+}
+
+if ( ! exists( 'is_assoc' ) ) {
+    function is_assoc ( $item ) {
+        return !! $item && \is_array($item) && ! \ctype_digit( \implode( '', \array_keys($item) ) );
+    }
+}
+
+/**
+ * 
+ */
+if ( ! exists( 'is_type' ) ) {
+    function is_type ( $type ) {
+        return \in_array( $type, (array) data('type') );
     }
 }
 
@@ -458,15 +465,6 @@ if ( ! exists( 'is_plural' ) ) {
         null === $data or $data = data();
         $data = (array) $data;
         return null !== $data['order'];
-    }
-}
-
-/**
- * 
- */
-if ( ! exists( 'is_type' ) ) {
-    function is_type ( $type ) {
-        return \in_array( $type, (array) data('type') );
     }
 }
 
@@ -591,31 +589,6 @@ if ( ! exists( 'run' ) ) {
         $data = data();
         
         render_e( is_plural( $data ) ? 'archive.php' : 'singular.php', $data );
-
-    }
-}
-
-if ( ! exists( 'fill_defaults' ) ) {
-    function fill_defaults () {
-
-        $data  = (object) data();
-        $uris  = (object) uris();
-        $paths = (object) paths();
-        
-        $defaults = array(
-            'title' => \str_replace( array('-', '_'), ' ', \basename( \rtrim( $uris->url, '/' ) ) )
-          , 'class' => ''
-        );
-        
-        json_update($paths->file, function ( $o ) {
-            unset ($o['url']);
-            unset ($o['moddate']);
-            return $o;
-        });
-        
-        // instead:
-        $data->moddate = mtime( \dirname($paths->file), 'Y-m-d' );
-        data( defaults($data, $defaults) );
 
     }
 }
@@ -764,7 +737,6 @@ if ( ! exists( 'normalize_data' ) ) {
 }
 
 options( 'ssv_props', array( 'js', 'css', 'tags', 'class', 'type' ) );
-# action( 'update', ns( 'fill_defaults' ) );
 action( 'update', ns( 'normalize_data' ) );
 
 # DEFAULT PATHS / URIS
@@ -791,6 +763,8 @@ action( 'update', ns( 'normalize_data' ) );
 
 });
 
+# 
+\file_exists( 'aqua-custom.php' ) and include_once( 'aqua-custom.php' );
 
 # INITIALIZE
 run( params() );
