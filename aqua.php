@@ -187,8 +187,8 @@ if ( ! exists( 'load_html' ) ) {
  */
 if ( ! exists( 'load_json' ) ) {
     function load_json ( $file, $assoc = false ) {
-        if ( empty($file) || ! \is_readable($file) || \is_dir($file) )
-            return false;
+        if ( ! $file || ! \is_readable($file) || \is_dir($file) )
+            return;
         return \json_decode( \file_get_contents( $file ), (bool) $assoc );
     }
 }
@@ -276,6 +276,20 @@ if ( ! exists( 'each' ) ) {
         foreach ( $o as $k => $v )
             if ( \call_user_func( $fn, $v, $k, $o ) === false )
                 break;
+        return $o;
+    }
+}
+
+/**
+ * Get a copy of `$o` with all its values set to `$value`.
+ * @param   array|object  $o
+ * @param   mixed         $value
+ * @return  array|object
+ */
+if ( ! exists( 'revalue' ) ) {
+    function revalue ( $o, $value = null ) {
+        foreach ( $o as &$v )
+            $v = $value;
         return $o;
     }
 }
@@ -397,7 +411,6 @@ if ( ! exists( 'hasher' ) ) {
     }
 }
 
-
 /**
  * Get or set data.
  */
@@ -408,6 +421,12 @@ if ( ! exists( 'data' ) ) {
         return \call_user_func_array( $data, func_get_args() );
     }
 }
+
+/*if ( ! exists( 'reset_data' ) ) {
+    function reset_data () {
+        ( $data = data() ) and data( \array_fill_keys( \array_keys($data), null ) );
+    }
+}*/
 
 /**
  * Get or set paths.
@@ -503,27 +522,32 @@ if ( ! exists( 'action' ) ) {
 
 if ( ! exists( 'render' ) ) {
     function render ( $view = null, $data = null ) {
+    
+        $html = '';
+        if ( ! \is_string($view) || ! \strlen($view) )
+            return $html;
+        $orig = (object) data(); # current instance
+        
+        if ( \is_scalar($data) )
+            \is_bool($data) or $data = load_json( slash_join( paths('root'), $data, 'index.json' ) );
+        elseif ( \func_num_args() < 2 )
+            $data = $orig;
 
-        $curr = data();
-        
-        if ( \func_num_args() < 2 )
-            $data = $curr;
-        elseif ( \is_scalar($data) && ! \is_bool($data) )
-            $data = load_json( slash_join( paths('root'), $data, 'index.json' ) );
-        
-        if ( $data ) {
+        if ( $data && ! \is_scalar($data) ) {
             if ( \is_array($data) && ! is_assoc($data) ) {
-                while( $data )
+                while ( $data )
                     $html .= render( $view, \array_shift($data) );
             } else {
-                $data = (object) normalize_data( $data );
+                data( revalue( $orig ) ); # nullify hash values
+                $data = (object) data( normalize_data( $data ) ); # normalize + update current instance
                 $html = load_html( locate_file( paths('views'), $view, (array) $data->type ) );
                 $html = insert_data( $html, $data );
                 $html = insert_data( $html, uris(), 'uri.' );
+                data( revalue( $data ) );  # nullify hash values
+                data( $orig ); # return the hash to its orig state
             }
         }
-
-        data( $curr );
+        
         return $html;
     }
 }
