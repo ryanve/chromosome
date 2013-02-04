@@ -502,7 +502,7 @@ if ( ! exists( 'action' ) ) {
             return;
 
         $hash[ $key ] or $hash[ $key ] = array();
-        $params = 1 == $n ? array() : $callback;
+        $params = 2 > $n ? array() : $callback;
 
         if ( \is_array($params) )
             foreach ( $hash[ $key ] as $fn ) # fire
@@ -604,14 +604,9 @@ if ( ! exists( 'run' ) ) {
         $data->moddate = date( 'Y-m-d', $data->modunix );
 
         # store the data to the hash for use from views and hooks
-        data( $data );
-            
-        # do updates
-        action( 'update' );
+        $data = data( $data );
         
-        # get updated data
-        $data = data();
-        
+        # echo markup
         render_e( is_plural( $data ) ? 'archive.php' : 'singular.php', $data );
 
     }
@@ -761,7 +756,6 @@ if ( ! exists( 'normalize_data' ) ) {
 }
 
 options( 'ssv_props', array( 'js', 'css', 'tags', 'class', 'type' ) );
-action( 'update', ns( 'normalize_data' ) );
 
 # DEFAULT PATHS / URIS
 \call_user_func(function () {
