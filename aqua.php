@@ -61,6 +61,12 @@ if ( ! exists( 'apply' ) ) {
     }
 }
 
+if ( ! exists( 'is_assoc' ) ) {
+    function is_assoc ( $item ) {
+        return !! $item && \is_array($item) && ! \ctype_digit( \implode( '', \array_keys($item) ) );
+    }
+}
+
 if ( ! exists( 'lslash' ) ) {
     function lslash ( $s, $chars = '/' ) {
         return $chars . \ltrim( $s, $chars );
@@ -175,7 +181,7 @@ if ( ! exists( 'locate_file' ) ) {
 if ( ! exists( 'load_html' ) ) {
     function load_html ( $file ) {
         \ob_start(); 
-        include_once ($file);
+        include ($file);
         $html = \ob_get_contents();
         \ob_end_clean();
         return $html;
@@ -270,6 +276,15 @@ if ( ! exists( 'pop' ) ) {
                 $arr = \explode( $d, $i > 0 ? \array_pop($arr) : $arr );
         $arr = (array) $arr;
         return \array_pop($arr);
+    }
+}
+
+if ( ! exists( 'each' ) ) {
+    function each ( &$o, $fn ) {
+        foreach ( $o as $k => $v )
+            if ( \call_user_func( $fn, $v, $k, $o ) === false )
+                break;
+        return $o;
     }
 }
 
@@ -439,8 +454,10 @@ if ( ! exists( 'options' ) ) {
  * 
  */
 if ( ! exists( 'is_plural' ) ) {
-    function is_plural () {
-        return null !== data('order');
+    function is_plural ( $data = null ) {
+        null === $data or $data = data();
+        $data = (array) $data;
+        return null !== $data['order'];
     }
 }
 
@@ -486,34 +503,62 @@ if ( ! exists( 'action' ) ) {
     }
 }
 
-if ( ! exists( 'run' ) ) {
-    function run ( $params = null ) {
+if ( ! exists( 'render' ) ) {
+    function render ( $view = null, $data = null ) {
 
+        $curr = data();
+        
+        if ( \func_num_args() < 2 )
+            $data = $curr;
+        elseif ( \is_scalar($data) && ! \is_bool($data) )
+            $data = load_json( slash_join( paths('root'), $data, 'index.json' ) );
+        
+        if ( $data ) {
+            if ( \is_array($data) && ! is_assoc($data) ) {
+                while( $data )
+                    $html .= render( $view, \array_shift($data) );
+            } else {
+                $data = (object) normalize_data( $data );
+                $html = load_html( locate_file( paths('views'), $view, (array) $data->type ) );
+                $html = insert_data( $html, $data );
+                $html = insert_data( $html, uris(), 'uri.' );
+            }
+        }
+
+        data( $curr );
+        return $html;
+    }
+}
+
+    
+
+if ( ! exists( 'run' ) ) {
+    function run ( $file = null ) {
+    
         static $ran;
-        if ( true === $params )
-            if ( true === $ran ) return;
-            else $params = null;
+    
+        if ( null === $file )
+            return true === $ran;
+
+        if ( ! \is_string( $file ) ) {
+            $file = (object) $file;
+            return run( $file->file );
+        }
+        
         $ran = true;
 
-        $params = params( $params );
-        if ( ! isset( $params->file ) )
-            return;
-            
         $paths = (object) paths();
         $uris  = (object) uris();
 
         # queries should be like: `file=2012/headline/index.json`
-        $params->path = rslash( \dirname( $params->file ) ); # relative
-        $params->file = slash_join( $paths->root, $params->file );
+        $request = rslash( \dirname( $file ) ); # relative
+        $file = slash_join( $paths->root, $file );
         
-        if ( ! \is_readable($params->file) )
+        if ( ! \is_readable($file) )
             return;
         
-        # add to paths() for access outside this func
-        $paths->file = paths( 'file', $params->file );
-        
-        # canonical url to current content
-        $uris->url = uris( 'url', slash_join( $uris->root, $params->path ) );
+        # add to paths() for use outside this func
+        # $paths->file = paths( 'file', $file );
 
         $type  = null;
         $name  = null;
@@ -522,55 +567,30 @@ if ( ! exists( 'run' ) ) {
         $feed  = array();
         $html  = '';
 
-        $data = load_json( $params->file );
+        $data = load_json( $file );
 
         if ( \is_array($data) )
             $data = (object) $data;
         elseif ( ! \is_object($data) )
             return;
+            
+        # canonical url to current content
+        # $uris->url = uris( 'url', slash_join( $uris->root, $request ) );
+        $data->url = uris( 'url', slash_join( $uris->root, $request ) );
+        
+        $data->modunix = mtime( \dirname($file) );
+        $data->moddate = date( 'Y-m-d', $data->modunix );
 
-        # store the data to the hash for access from views and hooks
+        # store the data to the hash for use from views and hooks
         data( $data );
             
-        # run updates
-        action( 'update', array($data, $uris, $paths) );
+        # do updates
+        action( 'update' );
         
         # get updated data
-        $data = (object) data();
-
-        if ( isset( $data->order ) ) {
-
-            $html    = load_html( locate_file($paths->views, 'archive.php', (array) $data->type) );
-            $article = load_html( locate_file($paths->views, 'excerpt.php', (array) $data->type) );
-            $feed = '';
-            $f = null;
-
-            foreach ( $data->order as $i => $u ) {
-                if ( $u ) {
-                    $f = slash_join( \dirname($params->file), $u, \basename($params->file) );
-                    \file_exists($f) or $f = slash_join( $paths->root, $u, \basename($params->file) );
-                    $u = load_json($f);
-                    if ( $u ) $feed .= insert_data( $article, $u );
-                    else \array_splice( $data->order , $i, 1 );
-                }
-            }
-
-            if ( ! $data->moddate || date('Y-m-d') !== $data->moddate ) {
-                $data->moddate = date('Y-m-d');
-                $data = (object) json_update( $params->file, (array) data( $data ) );
-            }
-
-            $html = insert_data( $html, array('feed' => $feed) );
-            $html = insert_data( $html, $data );
-            $html = insert_data( $html, $uris, 'uri.' );
-
-        } else {
-            $html = load_html( locate_file( $paths->views, 'singular.php', (array) $data->type ) );
-            $html = insert_data( $html, $data );
-            $html = insert_data( $html, $uris, 'uri.' );
-        }
-
-        echo $html;
+        $data = data();
+        
+        render_e( is_plural( $data ) ? 'archive.php' : 'singular.php', $data );
 
     }
 }
@@ -593,17 +613,6 @@ if ( ! exists( 'fill_defaults' ) ) {
             return $o;
         });
         
-        /*
-        $needs_update = ! $o['moddate'] || ! $data->url
-                      || $data->url !== $uris->url 
-                      || ! has_all( $data, $defaults );
-                      
-        
-        $needs_update and data( json_update($paths->file, function ( $o, $defaults ) {
-            $o['moddate'] = \date( 'Y-m-d' );
-            return defaults( $o, $defaults );
-        }, $defaults ) );
-        */
         // instead:
         $data->moddate = mtime( \dirname($paths->file), 'Y-m-d' );
         data( defaults($data, $defaults) );
@@ -675,6 +684,12 @@ if ( ! exists( 'data_e' ) ) {
     }
 }
 
+if ( ! exists( 'render_e' ) ) {
+    function render_e () {
+        echo apply( 'render', \func_get_args() );
+    }
+}
+
 if ( ! exists( 'meta_e' ) ) {
     function meta_e ( $name, $content ) {
         echo apply( 'meta', \func_get_args() );
@@ -714,9 +729,13 @@ if ( ! exists( 'pop_e' ) ) {
 # ACTIONS
 
 if ( ! exists( 'normalize_data' ) ) {
-    function normalize_data () {
+    function normalize_data ( $data = null ) {
 
-        $data = (array) data(); # get the current data
+        if ( $use_current = ! \func_num_args() )
+            $data = data();
+        else $data or $data = array();
+            
+        $data = (array) $data;
         
         foreach ( options('ssv_props') as $n ) {
             if ( null !== $data[$n] ) {
@@ -724,6 +743,9 @@ if ( ! exists( 'normalize_data' ) ) {
                 \is_array( $data[$n] )  and $data[$n] = \array_unique( \array_filter( $data[$n], 'strlen' ) );
             }
         }
+        
+        $data['slug'] = \basename( \rtrim( $data['url'], '/' ) );
+        $data['title'] or $data['title'] = $data['slug'];
 
         # convert class names to a string 
         isset( $data['class'] ) and $data['class'] = \implode( ' ', $data['class'] );
@@ -736,12 +758,13 @@ if ( ! exists( 'normalize_data' ) ) {
             }
         }
         
-        data( $data ); # update the current data (no need to update the json)
+        $use_current and data( $data ); # update the current data hash
+        return $data;
     }
 }
 
 options( 'ssv_props', array( 'js', 'css', 'tags', 'class', 'type' ) );
-action( 'update', ns( 'fill_defaults' ) );
+# action( 'update', ns( 'fill_defaults' ) );
 action( 'update', ns( 'normalize_data' ) );
 
 # DEFAULT PATHS / URIS
@@ -770,6 +793,6 @@ action( 'update', ns( 'normalize_data' ) );
 
 
 # INITIALIZE
-run(true);
+run( params() );
 
 #end
