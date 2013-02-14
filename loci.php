@@ -1,10 +1,10 @@
 <?php 
-namespace aqua;
+namespace loci;
 
 /**
- * aqua.php   Aqua is a PHP template engine that generates views
+ * loci.php   A PHP template engine that generates views
  *            based on content data stored in JSON files.
- * @link      http://github.com/ryanve/aqua
+ * @link      http://github.com/ryanve/loci
  * @author    Ryan Van Etten <@ryanve>
  * @version   0.x
  * @license   MIT
@@ -782,7 +782,7 @@ options( 'ssv_props', array( 'js', 'css', 'tags', 'class', 'type' ) );
 });
 
 # 
-\file_exists( 'aqua-custom.php' ) and include_once( 'aqua-custom.php' );
+\file_exists( 'custom.php' ) and include_once( 'custom.php' );
 
 # INITIALIZE
 run( params() );
