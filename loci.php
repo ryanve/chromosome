@@ -91,7 +91,7 @@ if ( ! exists( 'slash_join' ) ) {
  * @return  number|string|null
  */
 if ( ! exists( 'mtime' ) ) {
-    function mtime ( $path, $format = null  ) {
+    function mtime ( $path, $format = null ) {
         $time = null;
         if ( \is_string($path) && \is_readable($path) ) {
             if ( \is_dir($path) ) {
@@ -422,12 +422,6 @@ if ( ! exists( 'data' ) ) {
     }
 }
 
-/*if ( ! exists( 'reset_data' ) ) {
-    function reset_data () {
-        ( $data = data() ) and data( \array_fill_keys( \array_keys($data), null ) );
-    }
-}*/
-
 /**
  * Get or set paths.
  */
@@ -516,6 +510,52 @@ if ( ! exists( 'action' ) ) {
         elseif ( $hash[ $key ] ) # op was false => remove
             foreach ( $hash[ $key ] as $i => $fn )
                 $fn === $callback and \array_splice( $hash[ $key ], $i, 1 );
+    }
+}
+
+/**
+ * 
+ */
+if ( ! exists( 'process' ) ) {
+    function process ( $key, $callback = null, $op = null ) {
+    
+        static $hash;
+        static $all;
+        isset( $hash ) or $hash = array();
+        isset( $all )  or $all = array();
+        
+        if ( !( $num = \func_num_args() ) )
+            return;
+
+        if ( ! \is_scalar($key) ) {
+            if ( null === $key ) {
+                $callback and ( 0 === $op ? \array_unshift( $all, $callback ) : ( $all[] = $callback ) );
+            } elseif ( $num > 1 ) {
+                foreach ( $key as $v )
+                    process( $v, $callback, $op );
+            } else { 
+                ( $is_ob = \is_object($key) ) and $key = (array) $key;
+                foreach ( \array_keys($hash) as $k )
+                    foreach ( (array) $hash[ $k ] as $fn ) # fire
+                        $fn and $key[ $k ] = \call_user_func_array( $fn, array( $key[ $k ], $k, (object) $key ) );
+                foreach ( $all as $fn )
+                    $fn and $key = \array_merge( $key, (array) \call_user_func( $fn, (object) $key ) );
+                $is_ob and $key = (object) $key;
+            }
+            return $key;
+        }
+
+        $hash[ $key ] or $hash[ $key ] = array();
+
+        if ( false === $callback ) # remove all
+            unset( $hash[ $key ] );
+        elseif ( 0 === $op )       # set early
+            \array_unshift( $hash[ $key ], $callback );
+        elseif ( false !== $op )   # set normal
+            $hash[ $key ][] = $callback;
+        elseif ( $hash[ $key ] ) # op was false => remove
+            foreach ( $hash[ $key ] as $i => $fn )
+                $fn === $callback and \array_splice( $hash[ $key ], $i, 1 );
 
     }
 }
@@ -523,13 +563,14 @@ if ( ! exists( 'action' ) ) {
 if ( ! exists( 'render' ) ) {
     function render ( $view = null, $data = null ) {
     
+        $request;
         $html = '';
         if ( ! \is_string($view) || ! \strlen($view) )
             return $html;
         $orig = (object) data(); # current instance
         
         if ( \is_scalar($data) )
-            \is_bool($data) or $data = load_json( slash_join( paths('root'), $data, 'index.json' ) );
+            \is_bool($data) or $data = load_json( rslash( paths('root') ) . ( $request = rslash($data) ) .  'index.json' );
         elseif ( \func_num_args() < 2 )
             $data = $orig;
 
@@ -539,7 +580,11 @@ if ( ! exists( 'render' ) ) {
                     $html .= render( $view, \array_shift($data) );
             } else {
                 data( revalue( $orig ) ); # nullify hash values
-                $data = (object) data( normalize_data( $data ) ); # normalize + update current instance
+                $data = (object) data( normalize( $data ) ); # normalize + update current instance
+                if ( $request ) {
+                    $data->request = data( 'request', $request );
+                    $data->url = data( 'url', slash_join( uris('root'), $request ) );
+                }
                 $html = load_html( locate_file( paths('views'), $view, (array) $data->type ) );
                 $html = insert_data( $html, $data );
                 $html = insert_data( $html, uris(), 'uri.' );
@@ -597,8 +642,9 @@ if ( ! exists( 'run' ) ) {
             return;
             
         # canonical url to current content
-        # $uris->url = uris( 'url', slash_join( $uris->root, $request ) );
-        $data->url = uris( 'url', slash_join( $uris->root, $request ) );
+        # $data->url = uris( 'url', slash_join( $uris->root, $request ) );
+        $data->url = slash_join( $uris->root, $request );
+        $data->request = $request;
         
         $data->modunix = mtime( \dirname($file) );
         $data->moddate = date( 'Y-m-d', $data->modunix );
@@ -720,42 +766,43 @@ if ( ! exists( 'pop_e' ) ) {
 
 # ACTIONS
 
-if ( ! exists( 'normalize_data' ) ) {
-    function normalize_data ( $data = null ) {
-
+if ( ! exists( 'normalize' ) ) {
+    function normalize ( $context = null ) {
         if ( $use_current = ! \func_num_args() )
-            $data = data();
-        else $data or $data = array();
-            
-        $data = (array) $data;
-        
-        foreach ( options('ssv_props') as $n ) {
-            if ( null !== $data[$n] ) {
-                \is_string( $data[$n] ) and $data[$n] = \preg_split( '#\s+#', $data[$n] ); # ssv
-                \is_array( $data[$n] )  and $data[$n] = \array_unique( \array_filter( $data[$n], 'strlen' ) );
-            }
-        }
-        
-        $data['slug'] = \basename( \rtrim( $data['url'], '/' ) );
-        $data['title'] or $data['title'] = $data['slug'];
-
-        # convert class names to a string 
-        isset( $data['class'] ) and $data['class'] = \implode( ' ', $data['class'] );
-        
-        foreach ( array('pub', 'mod') as $n ) {
-            $datetime = $data[$n . 'date'];
-            if ( $datetime && ! $data[$n .= 'year'] ) {
-                $data[$n] = \array_shift( \explode( '-', (string) $datetime ) );
-                $data[$n] > 0 or $data[$n] = '';
-            }
-        }
-        
-        $use_current and data( $data ); # update the current data hash
-        return $data;
+            $context = data();
+        else $context or $context = array();
+        $context = process( $context );
+        $use_current and data( $context ); # update the current data hash
+        return $context;
     }
 }
 
-options( 'ssv_props', array( 'js', 'css', 'tags', 'class', 'type' ) );
+process( array( 'js', 'css', 'tags', 'class', 'type' ), function ( $v ) {
+    return ssv( \array_unique( (array) ssv($v) ) );
+});
+
+process( 'title', function ( $v, $k, $o ) {
+    $o = (object) $o;
+    return ( $v = esc($v) ) ? $v : \basename( \rtrim( $o->url, '/' ) );
+});
+
+process( 'slug', function ( $v, $k = null, $o = null ) {
+    $o = (object) $o;
+    return \basename( \rtrim( $o->url, '/' ) );
+});
+
+process( null, function ( $o ) {
+    $o = (array) $o;
+    foreach ( array('pub', 'mod') as $n ) {
+        $datetime = $o[$n . 'date'];
+        $n .= 'year';
+        if ( $datetime && ! $o[$n] ) {
+            $o[$n] = \array_shift( \explode( '-', (string) $datetime ) );
+            $o[$n] > 0 or $o[$n] = '';
+        }
+    }
+    return $o;
+});
 
 # DEFAULT PATHS / URIS
 \call_user_func(function () {
@@ -782,7 +829,7 @@ options( 'ssv_props', array( 'js', 'css', 'tags', 'class', 'type' ) );
 });
 
 # 
-\file_exists( 'custom.php' ) and include_once( 'custom.php' );
+\file_exists( 'loci-custom.php' ) and include_once( 'loci-custom.php' );
 
 # INITIALIZE
 run( params() );
