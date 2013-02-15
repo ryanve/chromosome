@@ -653,7 +653,7 @@ if ( ! exists( 'run' ) ) {
         $data = data( $data );
         
         # echo markup
-        render_e( is_plural( $data ) ? 'archive.php' : 'singular.php', $data );
+        render_e( 'type.php', $data );
 
     }
 }
