@@ -712,7 +712,6 @@ process( 'slug', function ( $v, $k = null, $o = null ) {
 
 process( null, function ( $o ) {
     $o = (array) $o;
-    echo classes();
     foreach ( array('pub', 'mod') as $n ) {
         $datetime = $o[$n . 'date'];
         $n .= 'year';
