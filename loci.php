@@ -202,31 +202,6 @@ if ( ! exists( 'insert_data' ) ) {
     }
 }
 
-/**
- * sanitize()                        Sanitize a string, with options.
- *
- * @param   string|mixed    $str     is the string you want to sanitize
- * @param   string          $space   is the whitespace replacement
- * @param   callback        $filter  is an optional callback to apply to $str
- * @return  string
- */
-if ( ! exists( 'sanitize' ) ) {
-    function sanitize ( $str, $space = '-', $filter = 'mb_strtolower' ) {
-
-        if ( ! $str || ! is_string($str) || !( $str = \trim($str) ) )
-            return \is_string($str) ? $str : '';
-
-        if ( $filter && \is_callable($filter) )
-            $str = \call_user_func($filter, $str);
-
-        if ( \is_string($space) ) # replace inner whitespace chars w/ $space
-            $str = \preg_replace('/[ \s\t\n\r\0\x0B]+/', $space, $str);
-
-        # remove entities, then octets, then anything not alphanumeric|underscore|space|dash
-        return \preg_replace('/&.+?;|%([a-fA-F0-9][a-fA-F0-9])|[^\w\s-]/', '', $str);
-    }
-}
-
 # make it easy to print arrays to string
 if ( ! exists( 'ssv', 'class' ) ) {
     class ssv {
