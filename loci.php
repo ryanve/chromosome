@@ -295,38 +295,6 @@ if ( ! exists( 'revalue' ) ) {
 }
 
 /**
- * @param   object|array   $r   receiver
- * @param   object|array   $s   supplier
- */
-if ( ! exists( 'aug' ) ) {
-    function aug ( &$r, $s ) {
-
-        if ( $r && \is_object($r) )
-            foreach ( $s as $k => $v )
-                $r->{ $k } = $v;
-
-        elseif ( \is_array($r) )
-            foreach ( $s as $k => $v )
-                $r[ $k ] = $v;
-
-        return $r;
-    }
-}
-
-/**
- * @param   object|array   $r     receiver
- * @param   object|array   $defs  defaults
- */
-if ( ! exists( 'defaults' ) ) {
-    function defaults ( &$r, $defs ) {
-        $defs = (array) $defs;
-        foreach ( $r as $k => $v )
-            $defs[ $k ] = $v;
-        return \is_object($r) ? (object) $defs : $defs;
-    }
-}
-
-/**
  * Escape a string for use in html (such as in html attributes).
  * @param   string|mixed  $value
  * @return  string
@@ -354,30 +322,6 @@ if ( ! exists( 'meta' ) ) {
                 return '<meta name='. $name .' content=\'' . $data . '\'>' . "\n";
         }
         return '';
-    }
-}
-
-/**
- * Check if all of B's keys are present in A
- * @param    object|array  $a
- * @param    object|array  $b
- * @return   boolean
- * @example  has_all( $a, $b )
- * @example  has_all( $a, $k1, $k2, ... )
- */
-if ( ! exists( 'has_all' ) ) {
-    function has_all ( $a, $b = null ) {
-
-        if ( \is_array($b) || \is_object($b) )
-            $b = \array_keys( (array) $b );
-        else $b = \array_slice( \func_get_args(), 1 );
-        
-        $a = (array) $a;
-        foreach ( $b as $key )
-            if ( ! isset( $a[$key] ) )
-                return false;
-
-        return true;
     }
 }
 
@@ -793,6 +737,7 @@ process( 'slug', function ( $v, $k = null, $o = null ) {
 
 process( null, function ( $o ) {
     $o = (array) $o;
+    echo classes();
     foreach ( array('pub', 'mod') as $n ) {
         $datetime = $o[$n . 'date'];
         $n .= 'year';
