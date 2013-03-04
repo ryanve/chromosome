@@ -401,38 +401,6 @@ if ( ! exists( 'is_plural' ) ) {
 }
 
 /**
- * Add or remove actions.
- */
-if ( ! exists( 'action' ) ) {
-    function action ( $key = null, $callback = null, $op = null ) {
-    
-        static $hash;
-        isset( $hash ) or $hash = array();
-
-        if ( !($n = \func_num_args()) )
-            return $hash;
-        if ( ! \is_scalar($key) )
-            return;
-
-        $hash[ $key ] or $hash[ $key ] = array();
-        $params = 2 > $n ? array() : $callback;
-
-        if ( \is_array($params) )
-            foreach ( $hash[ $key ] as $fn ) # fire
-                $fn and \call_user_func_array($fn, $params);
-        elseif ( false === $callback ) # remove all
-            unset( $hash[ $key ] );
-        elseif ( 0 === $op )       # set early
-            \array_unshift( $hash[ $key ], $callback );
-        elseif ( false !== $op )   # set normal
-            $hash[ $key ][] = $callback;
-        elseif ( $hash[ $key ] ) # op was false => remove
-            foreach ( $hash[ $key ] as $i => $fn )
-                $fn === $callback and \array_splice( $hash[ $key ], $i, 1 );
-    }
-}
-
-/**
  * 
  */
 if ( ! exists( 'process' ) ) {
