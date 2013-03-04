@@ -697,22 +697,22 @@ process( null, function ( $o ) {
     $paths = (object) paths();
     $uris  = (object) uris();
 
-    $paths->root  or $paths->root  = \dirname( __DIR__ );
-    $paths->tag   or $paths->tag   = slash_join( $paths->root, 'tag' );
-    $paths->views or $paths->views = slash_join( \is_dir('views') ? __DIR__ : $paths->root, 'views' );
+    $paths->root  = $paths->root  ?: \dirname(__DIR__);
+    $paths->tag   = $paths->tag   ?: slash_join( $paths->root, 'tag' );
+    $paths->posts = $paths->posts ?: slash_join( \is_dir('posts') ? __DIR__ : $paths->root, '_posts' );
+    $paths->views = $paths->views ?: slash_join( \is_dir('views') ? __DIR__ : $paths->root, '_views' );
     $paths->css = slash_join( $_SERVER['DOCUMENT_ROOT'], 'css/' );
     $paths->js  = slash_join( $_SERVER['DOCUMENT_ROOT'], 'js/' );
 
-    $uris->home or $uris->home = slash_join( 'http://' . $_SERVER['SERVER_NAME'] );
-    $uris->root or $uris->root = rslash( to_uri( $paths->root ) );
-    $uris->tag  or $uris->tag  = rslash( to_uri( $paths->tag ) );
+    $uris->home = $uris->home ?: slash_join( 'http://' . $_SERVER['SERVER_NAME'] );
+    $uris->root = $uris->root ?: rslash( to_uri( $paths->root ) );
+    $uris->tag  = $uris->tag  ?: rslash( to_uri( $paths->tag ) );
     $paths->css = slash_join( $uris->home, 'css/' );
     $paths->js  = slash_join( $uris->home, 'js/' );
     
     paths( $paths );
     uris( $uris );
     paths( \basename(__FILE__), __FILE__ );
-
 });
 
 # 
