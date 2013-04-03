@@ -1,0 +1,24 @@
+{
+    "name": "ryanve/loci",
+    "description": "JSON-based PHP template engine",
+    "homepage": "https://github.com/ryanve/loci",
+    "keywords": ["template", "json"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ryan Van Etten",
+            "homepage": "http://ryanve.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4",
+        "airve/path": ">=0.0"
+    },
+    "suggest": {
+        "airve/phat": ">=2.2"
+    },
+    "autoload": {
+        "files": ["bootstrap.php"]
+    },
+    "minimum-stability": "dev"
+}
