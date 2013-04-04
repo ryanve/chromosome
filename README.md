@@ -1,7 +1,6 @@
-[loci](http://github.com/ryanve/loci)
-====
+### [airve](https://github.com/airve)/[loci](https://github.com/airve/loci)
 
-an experimental PHP template engine that generates views based on content data stored in JSON files
+Loci is a lightweight PHP template engine that generates views based on content data stored in JSON files.
 
 ### server setup
 
