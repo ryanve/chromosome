@@ -19,7 +19,7 @@ if ( ! \function_exists(__NAMESPACE__ . '\\loci')) {
 if ( ! \class_exists(__NAMESPACE__ . '\\Loci')) {
     class Loci {
 
-        use \airve\Resolve;
+        use \airve\Mixin;
 
         protected $renderee;
         public $dir;

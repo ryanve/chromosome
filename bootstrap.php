@@ -6,9 +6,9 @@
 namespace airve;
 
 # Load dependencies and needed package files.
-\trait_exists('\\airve\\Resolve') or require './resolve.php'; 
-\class_exists('\\airve\\Path')    or require '../path/path.php';
-\class_exists('\\airve\\Loci')    or require './loci.php';
+\trait_exists('\\airve\\Mixin') or require '../mixin/mixin.php'; 
+\class_exists('\\airve\\Path')  or require '../path/path.php';
+\class_exists('\\airve\\Loci')  or require './loci.php';
 require_once './base.php';
 
 # Load suggestions if found:
