@@ -37,13 +37,22 @@ Loci::mixin('meta', function($name, $content = null) {
 
 Loci::on('normalize', function() {
     Loci::context()->data(function($data) {
+        if (empty($data['slug'])) {
+            $context = Loci::context();
+            $data['slug'] = empty($context->dir) ? '' : \basename($context->dir);
+        }
+
         $keys = Loci::option('keys:ssv') ?: [];
         foreach ($keys as $n)
             $data[$n] = empty($data[$n]) ? [] : Loci::toArray($data[$n]);
-            
-        if (\in_array('type', $keys) && \in_array('class', $keys))
-            foreach ($data['type'] as $type)
-                $data['class'][] = 'type-' . $type;
+        
+        if (\in_array('class', $keys)) {
+            if (\is_scalar($data['slug']) && \strlen($data['slug']))
+                $data['class'][] = 'slug-' . $data['slug'];
+            if (\in_array('type', $keys))
+                foreach ($data['type'] as $type)
+                    $data['class'][] = 'type-' . $type;
+        }
         
         foreach ($keys as $n)
             !empty($data[$n]) && \is_array($data[$n]) and $data[$n] = \array_unique($data[$n]);
