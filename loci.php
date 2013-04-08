@@ -130,7 +130,7 @@ if ( ! \class_exists(__NAMESPACE__ . '\\Loci')) {
         
         public static function esc($item) {
             $item and $item = static::result($item);
-            return ($item = (string) $item) ? \htmlentities($value, ENT_QUOTES, null, false) : $item;
+            return ($item = (string) $item) ? \htmlentities($item, ENT_QUOTES, null, false) : $item;
         }
         
         protected static function isAssoc($arr) {
