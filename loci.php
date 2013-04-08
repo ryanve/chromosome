@@ -31,7 +31,7 @@ if ( ! \class_exists(__NAMESPACE__ . '\\Loci')) {
             if (null === $data)
                 return $this;
             $this->dir = Path::isPath($data) ? \dirname(
-                $data = \is_file($data) ? $data : Path::join($data, static::option('index.json'))
+                $data = \is_file($data) ? $data : Path::join($data, static::option('basename:json'))
             ) : false;
             $data and $this->data(Path::getJson($data));
             static::trigger('normalize');
@@ -191,15 +191,17 @@ if ( ! \class_exists(__NAMESPACE__ . '\\Loci')) {
             if (null === $data)
                 $data = $this->data($this->renderee);
             elseif (\is_string($data))
-                $data = Path::getJson(Path::join($data, 'index.json'));
+                $data = Path::getJson(Path::join($data, 'basename:json'));
 
             if ($isMap = \is_object($data))
                 $data = $data instanceof $class ? $data->data($data->renderee) : \get_object_vars($data);
             else $isMap = empty($data) || static::isAssoc($data);
             
             $data = $data ?: [];
-            if ($isMap)
-                return static::template(static::view($view), $data, static::option());
+            if ($isMap) {
+                $view = static::template(static::view($view, $data['type']), $data, static::option());
+                return ($filter = static::option('filter:output')) ? \call_user_func($filter, $view) : $view;
+            }
 
             return \array_reduce($data, function($html, $item) use ($view, $class) {
                 null === $item or $html .= (new $class($item))->render($view);
@@ -207,14 +209,13 @@ if ( ! \class_exists(__NAMESPACE__ . '\\Loci')) {
             }, '');
         }
         
-        public static function view($view = null) {
+        public static function view($view = null, $types = []) {
             $dir = Path::rslash(static::option('path:views'));
-            $view = $view ?: static::option('view:default');
-            $params = \func_get_args();
-            $params[0] = $view;
-            $params[] = \array_shift($params);
+            $view = $view ?: (static::option('view:default'));
+            \is_array($types) || \is_object($types) or $types = \array_slice(func_get_args(), 1);
+            $types[] = $view;
             $prefix = 'view:';
-            foreach ($params as $type) {
+            foreach ($types as $type) {
                 if (\is_scalar($type)) {
                     $type = \ltrim($type, Path::slashes);
                     if ($op = static::option($prefix . $type)) {
@@ -222,10 +223,10 @@ if ( ! \class_exists(__NAMESPACE__ . '\\Loci')) {
                         static::trigger($prefix . $type);
                         return (string) $op();
                     }
-                    if (\is_file($dir . $type)) {
+                    if (\is_file($file = $dir . Path::ext($type, '.php'))) {
                         static::trigger($prefix);
                         static::trigger($prefix . $type);
-                        return (string) Path::loadFile($dir . $type);
+                        return (string) Path::loadFile($file);
                     }
                 } elseif ($type) {
                     static::trigger($prefix);

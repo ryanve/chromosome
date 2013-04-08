@@ -12,10 +12,10 @@ require_once 'bootstrap.php';
 Loci::option('path:posts', Path::root('_posts'));
 Loci::option('path:taxos', Path::root('_taxos'));
 Loci::option('path:views', Path::root('_views'));
-Loci::option('index.json', 'index.json');
-Loci::option('entry.html', 'entry.html');
+Loci::option('basename:json', 'index.json');
+Loci::option('basename:content', 'content.html');
 Loci::option('keys:ssv', ['type', 'class']);
-Loci::option('keys:imports', ['entry.html']);
+Loci::option('keys:imports', ['content.html']);
 Loci::option('uri:home', Path::toUrl(
     Loci::option('path:root', Path::root(null))
 ));
@@ -50,6 +50,10 @@ Loci::on('normalize', function() {
             !empty($data[$n]) && \is_array($data[$n]) and $data[$n] = \array_unique($data[$n]);
         return $data;
     });
+});
+
+Loci::on('phat.php', function() {
+    \is_callable('\\airve\\Phat::rebreak') and Loci::option('filter:output', '\\airve\\Phat::rebreak');
 });
 
 Loci::option('uri.current', (
@@ -97,6 +101,13 @@ Loci::on('normalize', function() {
 });
 
 Loci::option('view:default', function() {
+    $dir = Path::rslash(Loci::option('path:views'));
+    $types = Loci::context()->data('type');
+    if (\is_array($types)) {
+        foreach ($types as $type) {
+        
+        }
+    }
     $view = Path::rslash(Loci::option('path:views')) . 'default.php';
     return \is_readable($view) ? Path::loadFile($view) : '<pre><code>' . \json_encode(
         Loci::context()->data(), JSON_PRETTY_PRINT
