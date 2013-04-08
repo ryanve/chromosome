@@ -38,7 +38,9 @@ Loci::mixin('meta', function($name, $content = null) {
 Loci::on('normalize', function() {
     Loci::context()->data(function($data) {
         $ctxt = Loci::context();
-        $data['slug'] = empty($ctxt->dir) ? '' : \basename($ctxt->dir);
+        $data['slug'] = empty($ctxt->dir) ? (
+            isset($data['slug']) ? $data['slug'] : ''
+        ) : \basename($ctxt->dir);
 
         $keys = Loci::option('keys:ssv') ?: [];
         foreach ($keys as $n)
