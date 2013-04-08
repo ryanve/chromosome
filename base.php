@@ -9,8 +9,7 @@ use \airve\Path;
 require_once 'bootstrap.php';
 
 # Default options:
-Loci::option('path:posts', Path::root('_posts'));
-Loci::option('path:taxos', Path::root('_taxos'));
+Loci::option('path:items', Path::root('_items'));
 Loci::option('path:views', Path::root('_views'));
 Loci::option('basename:json', 'index.json');
 Loci::option('basename:content', 'content.html');
@@ -64,7 +63,7 @@ Loci::option('uri.current', (
 Loci::on('normalize', function() { 
     $ctxt = Loci::context();
     $url = Path::toUrl(Path::normalize(\str_replace([
-        Loci::option('path:posts')
+        Loci::option('path:items')
       , Loci::option('path:taxos')
       , Loci::option('path:root')
     ], '', $ctxt->dir)));
