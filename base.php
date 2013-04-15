@@ -35,6 +35,18 @@ Loci::mixin('meta', function($name, $content = null) {
 #Loci::option('path:css', Path::root('css'));
 #Loci::option('path:js', Path::root('js'));
 
+Loci::on('normalize', function() { 
+    $ctxt = Loci::context();
+    $time = $ctxt->data('pubdate');
+    $ctxt->data('pubyear', \strtok($time, '-'));
+    if ($ctxt->dir) {
+        $time = Path::mtime($ctxt->dir);
+        $ctxt->data('mtime', $time);
+        $ctxt->data('moddate', \date('Y-m-d', $time));
+        $ctxt->data('modyear', \date('Y', $time));
+    }
+});
+
 Loci::on('normalize', function() {
     Loci::context()->data(function($data) {
         $ctxt = Loci::context();
@@ -47,6 +59,7 @@ Loci::on('normalize', function() {
             $data[$n] = empty($data[$n]) ? [] : Loci::toArray($data[$n]);
         
         if (\in_array('class', $keys)) {
+            $data['class'][] = $ctxt->data('pubdate') === $ctxt->data('moddate') ? 'unrevised' : 'revised';
             if (\is_scalar($data['slug']) && \strlen($data['slug']))
                 $data['class'][] = 'slug-' . $data['slug'];
             if (\in_array('type', $keys))
@@ -79,18 +92,6 @@ Loci::on('normalize', function() {
     $ctxt->data('url', $url);
     Loci::option('uri.url', $url);
     Loci::option('uri.canonical', $url);
-});
-
-Loci::on('normalize', function() { 
-    $ctxt = Loci::context();
-    $time = $ctxt->data('pubdate');
-    $ctxt->data('pubyear', \strtok($time, '-'));
-    if ($ctxt->dir) {
-        $time = Path::mtime($ctxt->dir);
-        $ctxt->data('mtime', $time);
-        $ctxt->data('moddate', \date('Y-m-d', $time));
-        $ctxt->data('modyear', \date('Y', $time));
-    }
 });
 
 Loci::on('query:', function() {
