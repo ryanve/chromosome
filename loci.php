@@ -218,7 +218,7 @@ if ( ! \class_exists(__NAMESPACE__ . '\\Loci')) {
             foreach ($types as $type) {
                 if (\is_scalar($type)) {
                     $type = \ltrim($type, Path::slashes);
-                    if ($op = static::option($prefix . $type)) {
+                    if (\is_callable($op = static::option($prefix . $type))) {
                         static::trigger($prefix);
                         static::trigger($prefix . $type);
                         return (string) $op();
