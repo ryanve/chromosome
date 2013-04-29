@@ -11,10 +11,10 @@ require_once 'bootstrap.php';
 # Default options:
 Loci::option('path:items', Path::root('_items'));
 Loci::option('path:views', Path::root('_views'));
-Loci::option('basename:json', 'index.json');
-Loci::option('basename:content', 'content.html');
+Loci::option('basename:json', 'item.json');
+Loci::option('basename:html', 'item.html');
 Loci::option('keys:ssv', ['type', 'class']);
-Loci::option('keys:imports', ['content.html']);
+Loci::option('keys:imports', ['item.html']);
 Loci::option('uri:home', Path::toUrl(
     Loci::option('path:root', Path::root(null))
 ));

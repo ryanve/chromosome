@@ -3,7 +3,7 @@
  * @package  ryanve/loci
  * @link     http://loci.airve.com
  * @license  MIT
- * @version  1.0.0-pre
+ * @version  1.0.0
  */
 
 namespace airve;
