@@ -1,6 +1,6 @@
 <?php
 /**
- * @package  ryanve/loci
+ * @package  airve/loci
  * @link     http://loci.airve.com
  * @license  MIT
  * @version  1.0.0
