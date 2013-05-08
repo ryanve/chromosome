@@ -13,8 +13,9 @@ Loci::option('path:items', Path::root('_items'));
 Loci::option('path:views', Path::root('_views'));
 Loci::option('basename:json', 'item.json');
 Loci::option('basename:html', 'item.html');
-Loci::option('keys:ssv', ['type', 'class']);
+Loci::option('basename:css', 'item.css');
 Loci::option('keys:imports', ['item.html']);
+Loci::option('keys:ssv', ['type', 'class']);
 Loci::option('uri:home', Path::toUrl(
     Loci::option('path:root', Path::root(null))
 ));
