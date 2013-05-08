@@ -49,6 +49,13 @@ Loci::on('normalize', function() {
 });
 
 Loci::on('normalize', function() {
+    $ctxt = Loci::context();
+    $title = $ctxt->data('title');
+    $title or $title = $ctxt->data('title', '');
+    $ctxt->data('titlebar', $ctxt->data('titlebar') ?: $title);
+});
+
+Loci::on('normalize', function() {
     Loci::context()->data(function($data) {
         $ctxt = Loci::context();
         $data['slug'] = empty($ctxt->dir) ? (
