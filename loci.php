@@ -119,7 +119,7 @@ if ( ! \class_exists(__NAMESPACE__ . '\\Loci')) {
         
         public static function option() {
             static $bound;
-            $bound or $bound = array(static::inst(), 'data');
+            $bound or $bound = [static::inst(), 'data'];
             return \call_user_func_array($bound, \func_get_args());
         }
         
