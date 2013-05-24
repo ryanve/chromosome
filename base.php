@@ -119,12 +119,12 @@ Loci::on('normalize', function() {
 
 Loci::option('view:default', function() {
     $dir = Path::rslash(Loci::option('path:views'));
-    $types = Loci::context()->data('type');
-    if (\is_array($types)) {
-        foreach ($types as $type) {
-        
-        }
-    }
+    //$types = Loci::context()->data('type');
+    //if (\is_array($types)) {
+    //    foreach ($types as $type) {
+    //    
+    //    }
+    //}
     $view = Path::rslash(Loci::option('path:views')) . 'default.php';
     return \is_readable($view) ? Path::loadFile($view) : '<pre><code>' . \json_encode(
         Loci::context()->data(), JSON_PRETTY_PRINT
