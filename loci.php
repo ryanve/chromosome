@@ -209,14 +209,19 @@ if ( ! \class_exists(__NAMESPACE__ . '\\Loci')) {
             }, '');
         }
         
-        public static function view($views = null, $types = []) {
+        /**
+         * @param  string|array  $views
+         * @param  string|array  $types
+         * @return string|bool
+         */
+        public static function view($views = null, $types = null) {
 
             $prefix = 'view:';
             $dir = Path::rslash(static::option('path:views'));
-            $views = \is_array($views) ? \array_values($views) : (null === $views ? [] : [$views]);
-            $types = \is_array($types) ? \array_values($types) : (
+            $views = null === $views ? [] : (\is_array($views) ? \array_values($views) : [$views]);
+            $types = null === $types ? [] : (\is_array($types) ? \array_values($types) : (
                 \is_object($types) ? static::toArray($types) : \array_slice(func_get_args(), 1) 
-            );
+            ));
 
             # 1st: views suffixed with each type
             # 2nd: explicitly specified views
