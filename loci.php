@@ -3,7 +3,7 @@
  * @package  airve/loci
  * @link     http://loci.airve.com
  * @license  MIT
- * @version  1.0.3
+ * @version  1.0.4
  */
 
 namespace airve;
@@ -119,7 +119,7 @@ if ( ! \class_exists(__NAMESPACE__ . '\\Loci')) {
         
         public static function option() {
             static $bound;
-            $bound or $bound = [static::inst(), 'data'];
+            $bound or $bound = array(static::inst(), 'data');
             return \call_user_func_array($bound, \func_get_args());
         }
         
@@ -209,28 +209,40 @@ if ( ! \class_exists(__NAMESPACE__ . '\\Loci')) {
             }, '');
         }
         
-        public static function view($view = null, $types = []) {
-            $dir = Path::rslash(static::option('path:views'));
-            $view = $view ?: (static::option('view:default'));
-            \is_array($types) || \is_object($types) or $types = \array_slice(func_get_args(), 1);
-            $types[] = $view;
+        public static function view($views = null, $types = []) {
+
             $prefix = 'view:';
-            foreach ($types as $type) {
-                if (\is_scalar($type)) {
-                    $type = \ltrim($type, Path::slashes);
-                    if (\is_callable($op = static::option($prefix . $type))) {
+            $dir = Path::rslash(static::option('path:views'));
+            $views = \is_array($views) ? \array_values($views) : (null === $views ? [] : [$views]);
+            $types = \is_array($types) ? \array_values($types) : (
+                \is_object($types) ? static::toArray($types) : \array_slice(func_get_args(), 1) 
+            );
+
+            # 1st: views suffixed with each type
+            # 2nd: explicitly specified views
+            # 3rd: explicitly specified types
+            # 4th: default view option
+            foreach (\array_reverse($views) as $view)
+                \is_scalar($view) and $views = \array_merge(Path::affix($types, "$view-"), $views);
+            $views = \array_merge($views, $types, [static::option('view:default')]);
+            $types = null;
+
+            foreach ($views as $view) {
+                if (\is_scalar($view)) {
+                    $view = \ltrim($view, Path::slashes);
+                    if (\is_callable($op = static::option($prefix . $view))) {
                         static::trigger($prefix);
-                        static::trigger($prefix . $type);
+                        static::trigger($prefix . $view);
                         return (string) $op();
                     }
-                    if (\is_file($file = $dir . Path::ext($type, '.php'))) {
+                    if (\is_file($file = $dir . Path::ext($view, '.php'))) {
                         static::trigger($prefix);
-                        static::trigger($prefix . $type);
+                        static::trigger($prefix . $view);
                         return (string) Path::loadFile($file);
                     }
-                } elseif ($type) {
+                } elseif ($view) {
                     static::trigger($prefix);
-                    return (string) $type();
+                    return (string) $view();
                 }
             }
             return false;
