@@ -3,7 +3,7 @@
  * @package  airve/loci
  * @link     http://loci.airve.com
  * @license  MIT
- * @version  1.0.4
+ * @version  1.1.0
  */
 
 namespace airve;
@@ -33,7 +33,7 @@ if ( ! \class_exists(__NAMESPACE__ . '\\Loci')) {
             $this->dir = Path::isPath($data) ? \dirname(
                 $data = \is_file($data) ? $data : Path::join($data, static::option('basename:json'))
             ) : false;
-            $data and $this->data(Path::getJson($data));
+            $this->data(\is_file($data) ? Path::getJson($data) : ['type' => 'dir']);
             static::trigger('normalize');
         }
         

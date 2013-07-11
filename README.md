@@ -4,7 +4,7 @@ Loci is a lightweight PHP template engine that generates views based on content 
 
 ### server setup
 
-Add the following redirects to your root [.htaccess](http://en.wikipedia.org/wiki/Htaccess) file:
+Add the following rewrites to your root [.htaccess](http://en.wikipedia.org/wiki/Htaccess) file:
 
 ```
 # BEGIN LOCI
@@ -12,35 +12,26 @@ Add the following redirects to your root [.htaccess](http://en.wikipedia.org/wik
 # Change _items or _php as needed
 <IfModule mod_rewrite.c>
   RewriteEngine On
-    
-  # If dir does not exist, skip the next 4 rules
-  RewriteCond %{DOCUMENT_ROOT}/_php/airve/loci !-d
-  RewriteRule .* - [S=4]
-  
-  # OPTION 1: Unless file, add trailing slash
+
+  # Option 1: Unless file, add trailing slash.
   # RewriteCond %{REQUEST_FILENAME} !-f
   # RewriteRule ^.*[^/]$ /$0/ [L,R=301]
-  # OPTION 2: Unless dir, remove trailing slash
+  # Option 2: Unless dir, remove trailing slash.
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule ^(.*)[/]+$ /$1 [L,R=301]
   
-  # If not a file or dir, look in _items and rewrite if it exists there
+  # Search _items for non-existing URIs and rewrite if it exists there.
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteCond %{DOCUMENT_ROOT}/_items/%{REQUEST_URI} -d
+  RewriteCond %{DOCUMENT_ROOT}/_php/airve/loci -d
   RewriteRule ^(.*)$ /_php/airve/loci/request.php?request=$1&from=_items [L]
-  
-  # If not a file or dir, map direct file requests
+
+  # Map direct file requests.
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteCond %{DOCUMENT_ROOT}/_items/%{REQUEST_URI} -f
   RewriteRule ^(.*)$ _items/$1 [L]
-
-  # If other dir containing index.json, then rewrite
-  RewriteCond %{REQUEST_FILENAME} -d
-  RewriteCond %{REQUEST_FILENAME}index.json -f
-  RewriteCond %{REQUEST_URI} !^/?_items/.+$
-  RewriteRule ^(.*)$ /_php/airve/loci/request.php?request=$1 [L]
 </IfModule>
 # END LOCI
 ```
