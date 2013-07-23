@@ -11,7 +11,7 @@
     "require": {
         "php": ">=5.4",
         "airve/path": ">=0",
-        "airve/mixin": ">=0"
+        "airve/traits": ">=0.4"
     },
     "suggest": {
         "airve/phat": ">=2.2"

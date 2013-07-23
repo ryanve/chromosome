@@ -1,13 +1,14 @@
 <?php
 /**
- * @package  ryanve/loci
+ * @package  airve/loci
  */
  
 namespace airve;
 
 # dependencies
-\trait_exists('\\airve\\Mixin') or require \dirname(__DIR__) . '/mixin/mixin.php'; 
-\class_exists('\\airve\\Path')  or require \dirname(__DIR__) . '/path/path.php';
+\trait_exists('\\traits\\Mixin') or require \dirname(__DIR__) . '/traits/mixin.php'; 
+\trait_exists('\\traits\\Reflect') or require \dirname(__DIR__) . '/traits/reflect.php'; 
+\class_exists('\\airve\\Path') or require \dirname(__DIR__) . '/path/path.php';
 
 # needed package files
 \class_exists('\\airve\\Loci')  or require __DIR__ . '/loci.php';

@@ -3,7 +3,7 @@
  * @package  airve/loci
  * @link     http://loci.airve.com
  * @license  MIT
- * @version  1.1.0
+ * @version  1.2.0
  */
 
 namespace airve;
@@ -19,7 +19,8 @@ if ( ! \function_exists(__NAMESPACE__ . '\\loci')) {
 if ( ! \class_exists(__NAMESPACE__ . '\\Loci')) {
     class Loci {
 
-        use \airve\Mixin;
+        use \traits\Mixin;
+        use \traits\Reflect;
 
         protected $renderee;
         public $dir;
@@ -45,20 +46,6 @@ if ( ! \class_exists(__NAMESPACE__ . '\\Loci')) {
             $arr = \get_object_vars($this);
             $arr['option'] = $this->option();
             return \json_encode($arr, JSON_PRETTY_PRINT);
-        }
-        
-        public static function context($object = null) {
-            static $context;
-            $class = __CLASS__;
-            if (null === $object)
-                return $context = $context ?: new $class;
-            $object instanceof $class or $object = new $class($object);
-            return $context = $object;
-        }
-        
-        public static function inst($data = null) {
-            $class = \get_called_class();
-            return new $class($data);
         }
         
         //public function dir($relative = null) {
@@ -119,7 +106,7 @@ if ( ! \class_exists(__NAMESPACE__ . '\\Loci')) {
         
         public static function option() {
             static $bound;
-            $bound or $bound = array(static::inst(), 'data');
+            $bound or $bound = array(static::instantiate(), 'data');
             return \call_user_func_array($bound, \func_get_args());
         }
         

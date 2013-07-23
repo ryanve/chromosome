@@ -1,6 +1,6 @@
 <?php 
 /**
- * @package ryanve/loci
+ * @package airve/loci
  */
  
 namespace airve;
@@ -16,7 +16,7 @@ require_once 'bootstrap.php';
     $params['dir'] = isset($params['from']) ? Path::join(
         $params['from'], $params['request']
     ) : $params['request'];
-    $inst = Loci::inst(Path::root($params['dir']));
+    $inst = Loci::instantiate(Path::root($params['dir']));
     $inst->data($params, 'query:');
     Loci::trigger('query:');
     $inst->render_e();
