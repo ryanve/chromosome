@@ -1,10 +1,5 @@
-<?php 
-/**
- * @package  ryanve/loci
- */
-
-namespace airve;
-use \airve\Loci;
+<?php
+use \chromosome\Loci;
 use \airve\Path;
 require_once 'bootstrap.php';
 
@@ -140,4 +135,5 @@ Loci::on('view:default', function() {
 
 # Fire and flush event handlers.
 Loci::blast(\basename(__FILE__));
+
 #end

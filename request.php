@@ -1,15 +1,10 @@
-<?php 
-/**
- * @package airve/loci
- */
- 
-namespace airve;
-use \airve\Loci;
+<?php
+use \chromosome\Loci;
 use \airve\Path;
 require_once 'bootstrap.php';
 
 \call_user_func(function($query) {
-    $params = array();
+    $params = [];
     \parse_str($query, $params);    
     if (empty($params['request']))
         return false;
@@ -24,4 +19,5 @@ require_once 'bootstrap.php';
 
 # Fire and flush event handlers.
 Loci::blast(\basename(__FILE__));
+
 #end

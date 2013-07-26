@@ -1,8 +1,8 @@
 {
-    "name": "airve/loci",
+    "name": "airve/chromosome",
     "description": "JSON-based PHP template engine",
     "homepage": "http://loci.airve.com",
-    "keywords": ["json", "template", "generator"],
+    "keywords": ["json", "template", "engine", "generator"],
     "license": "MIT",
     "authors": [{
         "name": "Ryan Van Etten",

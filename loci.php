@@ -1,12 +1,12 @@
 <?php
 /**
- * @package  airve/loci
+ * @package  airve/chromosome
  * @link     http://loci.airve.com
  * @license  MIT
- * @version  1.2.0
+ * @version  2.0.0-0
  */
 
-namespace airve;
+namespace chromosome;
 use \airve\Path;
 require_once 'bootstrap.php';
 
@@ -245,4 +245,5 @@ if ( ! \class_exists(__NAMESPACE__ . '\\Loci')) {
 
 # Fire and flush event handlers.
 Loci::blast(\basename(__FILE__));
+
 #end
