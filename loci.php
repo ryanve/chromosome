@@ -48,10 +48,6 @@ if ( ! \class_exists(__NAMESPACE__ . '\\Loci')) {
             return \json_encode($arr, JSON_PRETTY_PRINT);
         }
         
-        //public function dir($relative = null) {
-        //    return null === $relative ? $this->dir : Path::join($this->dir ?: '.', $relative);
-        //}
-        
         public static function on($name, $fn = null) {
             $name = ($ssv = ! \is_array($name)) ? \preg_split('#\s+#', $name) : $name;
             foreach ($name as $n => $f) {

@@ -36,11 +36,6 @@ Loci::mixin('meta', function($name, $content = null) {
     return $name && \is_string($content) ? "<meta name='$name' content='$content'>" . "\n" : '';  
 });
 
-#Loci::option('uri:css', Loci::home('css'));
-#Loci::option('uri:js', Loci::home('js'));
-#Loci::option('path:css', Path::root('css'));
-#Loci::option('path:js', Path::root('js'));
-
 Loci::on('normalize', function() { 
     $ctxt = Loci::context();
     $time = $ctxt->data('pubdate');
@@ -107,12 +102,6 @@ Loci::on('normalize', function() {
     Loci::option('uri.canonical', $url);
 });
 
-Loci::on('query:', function() {
-    #$canonical = Loci::home(Loci::option('query:request'));
-    #Loci::context()->data('url', $canonical);
-    #Loci::option('uri:canonical', $canonical);
-});
-
 Loci::on('normalize', function() {
     $ctx = Loci::context();
     $dir = $ctx->dir;
@@ -124,12 +113,6 @@ Loci::on('normalize', function() {
 
 Loci::option('view:default', function() {
     $dir = Path::rslash(Loci::option('path:views'));
-    //$types = Loci::context()->data('type');
-    //if (\is_array($types)) {
-    //    foreach ($types as $type) {
-    //    
-    //    }
-    //}
     $view = Path::rslash(Loci::option('path:views')) . 'default.php';
     return \is_readable($view) ? Path::loadFile($view) : '<pre><code>' . \json_encode(
         Loci::context()->data(), JSON_PRETTY_PRINT
