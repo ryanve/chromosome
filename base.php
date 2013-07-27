@@ -15,6 +15,16 @@ Loci::option('uri:home', Path::toUrl(
     Loci::option('path:root', Path::root(null))
 ));
 
+Loci::on('bootstrap.php', function() {
+    if (\is_file($data = Path::root('chromosome.json')) and $data = Path::getJson($data)) {
+        $load = [];
+        foreach ($data as $k => $v)
+            'path:files' === $k ? ($v and $load = (array) $v) : Loci::option($k, $v);
+        foreach ($load as $file)
+            $file and include_once(Path::root($file));
+    }
+});
+
 \array_reduce(['uri:home', 'path:root'], function($void, $key) {
     Loci::mixin(\substr(\strrchr($key, ':'), 1), function($relative = '') use ($key) {
         $base = Loci::option($key);
