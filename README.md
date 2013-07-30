@@ -31,6 +31,12 @@ Add the following [Apache](http://httpd.apache.org/docs/2.0/misc/rewriteguide.ht
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteCond %{DOCUMENT_ROOT}/_items/%{REQUEST_URI} -f
   RewriteRule ^(.*)$ _items/$1 [L]
+  
+  # Rewrite other dirs that contain the JSON file.
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteCond %{REQUEST_FILENAME}item.json -f
+  RewriteCond %{REQUEST_URI} !^/?_items/.+$
+  RewriteRule ^(.*)$ /_php/chromosome/request.php?request=$1 [L]
 </IfModule>
 # END Chromosome
 ```
