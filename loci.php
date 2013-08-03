@@ -3,7 +3,7 @@
  * @package  airve/chromosome
  * @link     http://loci.airve.com
  * @license  MIT
- * @version  2.0.0-2
+ * @version  2.0.0-3
  */
 
 namespace chromosome;
@@ -29,13 +29,13 @@ if ( ! \class_exists(__NAMESPACE__ . '\\Loci')) {
         
         public function __construct($data = null) {
             static::context($this);
-            if (null === $data)
-                return $this;
-            $this->dir = Path::isPath($data) ? \dirname(
-                $data = \is_file($data) ? $data : Path::join($data, static::option('basename:json'))
-            ) : false;
-            $this->data(\is_file($data) ? Path::getJson($data) : ['type' => 'dir']);
-            static::trigger('normalize');
+            if (null !== $data) {
+                Path::isPath($data) && ($this->dir = \dirname(
+                    $data = \is_file($data) ? $data : Path::join($data, static::option('basename:json'))
+                )) and $data = \is_file($data) ? Path::getJson($data) : ['type' => 'dir'];
+                $data and $this->data($data);
+                static::trigger('normalize');
+            }
         }
         
         public function __destruct() {
