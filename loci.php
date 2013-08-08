@@ -3,7 +3,7 @@
  * @package  airve/chromosome
  * @link     http://loci.airve.com
  * @license  MIT
- * @version  2.0.0-3
+ * @version  2.0.0-4
  */
 
 namespace chromosome;

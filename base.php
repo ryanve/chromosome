@@ -18,10 +18,11 @@ Loci::option('uri:home', Path::toUrl(
 Loci::on('bootstrap.php', function() {
     if (\is_file($data = Path::root('chromosome.json')) and $data = Path::getJson($data)) {
         $load = [];
+        $root = Path::method('root');
         foreach ($data as $k => $v)
-            'path:files' === $k ? ($v and $load = (array) $v) : Loci::option($k, $v);
-        foreach ($load as $file)
-            $file and include_once(Path::root($file));
+            Loci::option($k, 'path:' === \substr($k, 0, 5) ? (\is_array($v) ? \array_map($root, $v) : Path:root($v)) : $v);
+        foreach ((array) Loci::option('path:files') as $file)
+            $file && \is_file($file) and include_once($file);
     }
 });
 
