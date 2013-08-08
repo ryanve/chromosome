@@ -20,7 +20,9 @@ Loci::on('bootstrap.php', function() {
         $load = [];
         $root = Path::method('root');
         foreach ($data as $k => $v)
-            Loci::option($k, 'path:' === \substr($k, 0, 5) ? (\is_array($v) ? \array_map($root, $v) : Path:root($v)) : $v);
+            Loci::option($k, 'path:' === \substr($k, 0, 5) ? (
+                \is_array($v) ? \array_map($root, $v) : Path::root($v)
+            ) : $v);
         foreach ((array) Loci::option('path:files') as $file)
             $file && \is_file($file) and include_once($file);
     }
