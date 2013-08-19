@@ -3,7 +3,7 @@
  * @package  airve/chromosome
  * @link     http://loci.airve.com
  * @license  MIT
- * @version  2.0.0-4
+ * @version  2.0.0-5
  */
 
 namespace chromosome;
@@ -78,14 +78,11 @@ if ( ! \class_exists(__NAMESPACE__ . '\\Loci')) {
         
         public function data($key = null, $val = null) {
             $key and $key = static::result($key, $this->data);
-            $hasVal = 1 < \func_num_args();
             if (null === $key)
-                return $hasVal ? null : $this->data;
+                return 1 < \func_num_args() ? null : $this->data;
             if (\is_scalar($key)) {
-                if (true === $key)
-                    return $this->data = static::revalue($this->data, $val);
-                if ($hasVal)
-                    return $this->data[$key] = $val;
+                if (true === $key) return $this->data = static::revalue($this->data, $val);
+                if (1 < \func_num_args()) return $this->data[$key] = $val;
                 return isset($this->data[$key]) ? $this->data[$key] : null;
             }
             $prefix = \is_string($val) ? $val : '';
@@ -118,15 +115,13 @@ if ( ! \class_exists(__NAMESPACE__ . '\\Loci')) {
         
         protected static function isAssoc($arr) {
             foreach ($arr as $i => $v)
-                if ( ! \is_int($i))
-                    return true;
+                if ( ! \is_int($i)) return true;
             return false;
         }
         
         protected static function isDeep($arr) {
             foreach ($arr as $v)
-                if (null !== $v && ! \is_scalar($v))
-                    return true;
+                if (null !== $v && ! \is_scalar($v)) return true;
             return false;
         }
         
@@ -167,7 +162,6 @@ if ( ! \class_exists(__NAMESPACE__ . '\\Loci')) {
         }
 
         public function render($view = null, $data = null) {
-
             $class = __CLASS__;
             $data and $data = static::result($data);
             
@@ -198,7 +192,6 @@ if ( ! \class_exists(__NAMESPACE__ . '\\Loci')) {
          * @return string|bool
          */
         public static function view($views = null, $types = null) {
-
             $prefix = 'view:';
             $dir = Path::rslash(static::option('path:views'));
             $views = null === $views ? [] : (\is_array($views) ? \array_values($views) : [$views]);
