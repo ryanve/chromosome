@@ -1,6 +1,6 @@
 <?php
 use \chromosome\Loci;
-use \airve\Path;
+use \slash\Path;
 require_once 'bootstrap.php';
 
 # Default options:

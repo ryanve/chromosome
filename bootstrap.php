@@ -1,11 +1,11 @@
 <?php
 use \chromosome\Loci;
-use \airve\Path;
+use \slash\Path;
 
 # dependencies
 \trait_exists('\\traits\\Mixin') or require \dirname(__DIR__) . '/traits/mixin.php'; 
 \trait_exists('\\traits\\Reflect') or require \dirname(__DIR__) . '/traits/reflect.php'; 
-\class_exists('\\airve\\Path') or require \dirname(__DIR__) . '/path/path.php';
+\class_exists('\\slash\\Path') or require \dirname(__DIR__) . '/slash/path.php';
 
 # needed package files
 \class_exists('\\chromosome\\Loci') or require __DIR__ . '/loci.php';
