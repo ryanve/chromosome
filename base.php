@@ -85,7 +85,7 @@ Loci::on('normalize', function() {
 });
 
 Loci::on('phat.php', function() {
-    \is_callable('\\airve\\Phat::rebreak') and Loci::option('filter:output', '\\airve\\Phat::rebreak');
+    \is_callable('\\phat\\Phat::rebreak') and Loci::option('filter:output', '\\phat\\Phat::rebreak');
 });
 
 Loci::option('uri.current', (

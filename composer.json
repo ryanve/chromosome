@@ -1,5 +1,6 @@
 {
-    "name": "airve/chromosome",
+    "name": "ryanve/chromosome",
+    "version": "2.0.0-7",
     "description": "JSON-based PHP template engine",
     "homepage": "http://loci.airve.com",
     "keywords": ["json", "template", "engine", "generator"],
@@ -10,11 +11,11 @@
     }],
     "require": {
         "php": ">=5.4",
-        "ryanve/slash": ">=0",
-        "airve/traits": ">=0.4"
+        "ryanve/slash": "*",
+        "ryanve/traits": ">=0.4"
     },
     "suggest": {
-        "airve/phat": ">=2.2"
+        "ryanve/phat": ">=2.2"
     },
     "autoload": {
         "files": ["bootstrap.php"]

@@ -1,11 +1,4 @@
 <?php
-/**
- * @package  airve/chromosome
- * @link     http://loci.airve.com
- * @license  MIT
- * @version  2.0.0-6
- */
-
 namespace chromosome;
 use \slash\Path;
 require_once 'bootstrap.php';
@@ -228,7 +221,6 @@ if ( ! \class_exists(__NAMESPACE__ . '\\Loci')) {
             }
             return false;
         }
-
     }#class
 }
 
