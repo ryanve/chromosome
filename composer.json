@@ -15,7 +15,7 @@
         "ryanve/traits": ">=0.4"
     },
     "suggest": {
-        "ryanve/phat": ">=2.2"
+        "ryanve/phat": ">=2.5"
     },
     "autoload": {
         "files": ["bootstrap.php"]
