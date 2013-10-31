@@ -19,5 +19,3 @@ require_once 'bootstrap.php';
 
 # Fire and flush event handlers.
 Loci::blast(\basename(__FILE__));
-
-#end
