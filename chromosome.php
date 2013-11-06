@@ -78,8 +78,7 @@ if ( ! \class_exists(__NAMESPACE__ . '\\Chromosome')) {
         
         public static function option() {
             static $bound;
-            $bound or $bound = array(static::instantiate(), 'data');
-            return \call_user_func_array($bound, \func_get_args());
+            return \call_user_func_array($bound ?: $bound = [static::instantiate(), 'data'], \func_get_args());
         }
         
         public function feed($key = null) {
