@@ -1,0 +1,14 @@
+{
+    "name": "chromosome",
+    "description": "chromosome node implementation",
+    "version": "0.0.0",
+    "homepage": "https://github.com/ryanve/chromosome",
+    "license": "MIT",
+    "author": "Ryan Van Etten",
+    "keywords": ["server"],
+    "main": "./chromosome.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ryanve/chromosome.git"
+    }
+}
