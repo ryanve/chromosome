@@ -24,6 +24,7 @@
         }
       , jsonName = 'basename:json'
       , dirData = {'type': 'dir'}
+      , create = Object.create
       , assign = Object.assign;
 
     /**
@@ -31,7 +32,7 @@
      * @param {(string|Object)=} data
      */
     function Api(data) {
-        this._data = Object.create(null);
+        this._data = create(null);
         api.context(this);
         if (null != data) {
             isPath(data) && (this.dir = path.dirname(
@@ -74,6 +75,7 @@
         return pair ? cache[k] = v : cache[k];
     };
 
+    api._data = create(null);
     api.option = model.data.bind(api);
 
     return api;
