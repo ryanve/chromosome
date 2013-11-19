@@ -10,5 +10,8 @@
     "repository": {
         "type": "git",
         "url": "https://github.com/ryanve/chromosome.git"
+    },
+    "devDependencies": {
+        "emits": "~0.0.0"
     }
 }

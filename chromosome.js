@@ -5,6 +5,7 @@
       , implement = api.prototype = Api.prototype
       , fs = require('fs')
       , path = require('path')
+      , emits = require('emits')
       , isFile = function(s) {
             return fs.lstatSync(s).isFile();
         }
@@ -37,7 +38,7 @@
                 data = isFile(data) ? data : path.join(data, api.option(jsonName))
             )) && (data = isFile(data) ? readJson(data) : dirData);
             data && this.data(data);
-            //api.emit('normalize');
+            api.emit('normalize', this);
         }
     }
     
@@ -48,7 +49,11 @@
     function api(data) {
         return new Api(data);
     }
-    
+
+    // Build api into an emitter.
+    emits.call(api);
+    assign(api, emits.prototype);
+
     /**
      * @param {Object=} o
      * @return {Api} current instance
