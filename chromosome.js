@@ -27,6 +27,7 @@
 
     /**
      * @constructor
+     * @param {(string|Object)=} data
      */
     function Api(data) {
         this._data = Object.create(null);
@@ -40,15 +41,26 @@
         }
     }
     
+    /**
+     * @param {(string|Object)=} data
+     * @return {Api}
+     */
     function api(data) {
         return new Api(data);
     }
-    implement = api.prototype = Api.prototype;
     
-    api.context = function(ob) {
-        return curr = null == ob ? curr || api() : ob instanceof Api ? ob : api(ob);
+    /**
+     * @param {Object=} o
+     * @return {Api} current instance
+     */
+    api.context = function(o) {
+        return curr = null == o ? curr || api() : o instanceof Api ? o : api(o);
     };
 
+    /**
+     * @param {*=} k
+     * @param {*=} v
+     */
     implement.data = function(k, v) {
         var cache = this._data, pair = 1 < arguments.length;
         if (typeof k == 'function') k = k.call(this, cache);
