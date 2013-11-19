@@ -1,4 +1,5 @@
 <?php
+namespace chromosome;
 use \chromosome\Chromosome;
 use \slash\Path;
 
@@ -6,7 +7,13 @@ use \slash\Path;
 \trait_exists('\\traits\\Aware') or require \dirname(__DIR__) . '/traits/Aware.php'; 
 \trait_exists('\\traits\\Data') or require \dirname(__DIR__) . '/traits/Data.php';
 \trait_exists('\\traits\\Mixin') or require \dirname(__DIR__) . '/traits/Mixin.php'; 
+\trait_exists('\\traits\\Emitter') or require \dirname(__DIR__) . '/traits/Emitter.php'; 
 \class_exists('\\slash\\Path') or require \dirname(__DIR__) . '/slash/Path.php';
+
+# we need this as a class
+if ( ! \class_exists('\\chromosome\\Emitter')) {
+    class Emitter { use \traits\Emitter; }
+}
 
 # needed package files
 \class_exists('\\chromosome\\Chromosome') or require __DIR__ . '/chromosome.php';

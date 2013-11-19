@@ -1,17 +1,19 @@
-(function(make) {
-    module.exports = make();
-}(function() {
+(function(root, name, make) {
+    typeof module != 'undefined' && module.exports ? module.exports = make() : root[name] = make();
+}(this, 'chromosome', function() {
     var curr
       , model = api.prototype = Api.prototype
-      , fs = require('fs')
-      , path = require('path')
-      , emits = require('emits')
+      , req = typeof require == 'function' && require
+      , win = typeof window != 'undefined' && window
+      , fs = req && req('fs')
+      , path = req && req('path')
+      , emits = req ? req(win ? 'emits' : './node_modules/emits') : win['emits']
       , isFile = function(s) {
             return fs.lstatSync(s).isFile();
         }
-      , isDir = function(s) {
-            return fs.lstatSync(s).isDirectory();
-        }
+      //, isDir = function(s) {
+      //      return fs.lstatSync(s).isDirectory();
+      //}
       , isPath = function(s) {
             return fs.existsSync(s);
         }
@@ -24,8 +26,13 @@
         }
       , jsonName = 'basename:json'
       , dirData = {'type': 'dir'}
+      , keys = Object.keys
       , create = Object.create
-      , assign = Object.assign;
+      , assign = function(to, from) {
+            return keys(from).some(function(k) {
+                to[k] = from[k];
+            }), to;
+        };
 
     /**
      * @constructor

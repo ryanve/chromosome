@@ -1,4 +1,4 @@
-<?php
+<?php#emitter
 namespace chromosome;
 use \slash\Path;
 require_once 'bootstrap.php';
@@ -42,19 +42,17 @@ if ( ! \class_exists(__NAMESPACE__ . '\\Chromosome')) {
             return \json_encode($arr, JSON_PRETTY_PRINT);
         }
         
-        public static function on($name, $fn = null) {
-            $name = ($ssv = ! \is_array($name)) ? \preg_split('#\s+#', $name) : $name;
-            foreach ($name as $n => $f) {
-                empty(static::$handlers[$n = $ssv ? $f : $n]) and static::$handlers[$n] = [];
-                static::$handlers[$n][] = $ssv ? $fn : $f; 
-            }
+        protected static function emitter() {
+            static $emitter;
+            return $emitter ?: $emitter = new Emitter;
+        }
+        
+        public static function on() {
+            return \call_user_func_array([static::emitter(), 'on'], func_get_args());
         }
 
-        public static function off($name, $fn = null) {
-            \is_array($name) or $name = \array_fill_keys(\preg_split('#\s+#', $name), $fn);
-            foreach ($name as $n => $f)
-                empty(static::$handlers[$n]) or static::$handlers[$n] = null === $f ? null 
-                    : \array_diff(static::$handlers[$n], \is_object($f) ? [$f] : (array) $f);
+        public static function on() {
+            return \call_user_func_array([static::emitter(), 'on'], func_get_args());
         }
 
         public static function trigger($name, $scope = null) {
