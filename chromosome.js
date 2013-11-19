@@ -1,7 +1,8 @@
 (function(make) {
     module.exports = make();
 }(function() {
-    var curr, implement
+    var curr
+      , implement = api.prototype = Api.prototype
       , fs = require('fs')
       , path = require('path')
       , isFile = function(s) {
