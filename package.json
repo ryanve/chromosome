@@ -11,7 +11,12 @@
         "type": "git",
         "url": "https://github.com/ryanve/chromosome.git"
     },
-    "devDependencies": {
+    "dependencies": {
         "emits": "~0.0.0"
+    },
+    "devDependencies": {
+        "aok": "~1.7.0",
+        "grunt": "~0.4.1",
+        "grunt-contrib-jshint": "~0.6.4"
     }
 }
