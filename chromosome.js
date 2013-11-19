@@ -2,7 +2,7 @@
     module.exports = make();
 }(function() {
     var curr
-      , implement = api.prototype = Api.prototype
+      , model = api.prototype = Api.prototype
       , fs = require('fs')
       , path = require('path')
       , emits = require('emits')
@@ -66,7 +66,7 @@
      * @param {*=} k
      * @param {*=} v
      */
-    implement.data = function(k, v) {
+    model.data = function(k, v) {
         var cache = this._data, pair = 1 < arguments.length;
         if (typeof k == 'function') k = k.call(this, cache);
         if (null == k) return pair ? void 0 : cache;
@@ -74,7 +74,7 @@
         return pair ? cache[k] = v : cache[k];
     };
 
-    api.option = implement.data.bind(api);
+    api.option = model.data.bind(api);
 
     return api;
 }));
