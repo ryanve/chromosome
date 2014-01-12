@@ -24,7 +24,12 @@
             if (isExt(p, '.json')) require(p);
             else throw Error('.json expected');
         }
+      , read = function(p) {
+            return isPath(p) ? fs.readFileSync(p) : void 0;
+        }
+      , htmlName = 'basename:html'
       , jsonName = 'basename:json'
+      , viewsPath = 'path:views'
       , dirData = {'type': 'dir'}
       , keys = Object.keys
       , create = Object.create
@@ -81,9 +86,24 @@
         if (k === Object(k)) return assign(cache, k);
         return pair ? cache[k] = v : cache[k];
     };
+    
+    model.view = function(basename) {
+        return read(path.join(api.option(viewsPath), null == basename ? 'default.html' : basename));
+    };
+    
+    model.read = function(basename) {
+        var p = path.join(this.dir, basename); // maybe resolve
+        return isExt(p, '.json') ? require(p) || {} : read(p) || '';
+    };
+    
+    model.render = function(view) {
+        var data = this.data(htmlName, this.format(this.read(api.option(htmlName)))); // todo: imports
+        return this.template(this.view(view), data);
+    };
 
     api._data = create(null);
     api.option = model.data.bind(api);
+    api.option(viewsPath, '_views');
 
     return api;
 }));
