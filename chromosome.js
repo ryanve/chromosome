@@ -8,7 +8,7 @@
     , win = typeof window != 'undefined' && window
     , fs = req && req('fs')
     , path = req && req('path')
-    , emits = req ? req(win ? 'emits' : './node_modules/emits') : win['emits']
+    , emitter = req ? req(win ? 'energy' : './node_modules/energy') : win['energy']
     , isFile = function(s) {
         return fs.lstatSync(s).isFile();
       }
@@ -65,8 +65,8 @@
   }
 
   // Build api into an emitter.
-  emits.call(api);
-  assign(api, emits.prototype);
+  emitter.call(api);
+  assign(api, emitter.prototype);
 
   /**
    * @param {Object=} o
