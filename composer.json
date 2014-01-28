@@ -1,8 +1,7 @@
 {
     "name": "ryanve/chromosome",
-    "version": "2.0.0-8",
     "description": "JSON-based PHP template engine",
-    "homepage": "http://loci.airve.com",
+    "homepage": "http://github.com/ryanve/chromosome",
     "keywords": ["json", "template", "engine", "generator"],
     "license": "MIT",
     "authors": [{
