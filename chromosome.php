@@ -18,7 +18,6 @@ if ( ! \class_exists(__NAMESPACE__ . '\\Chromosome')) {
 
         protected $renderee;
         public $dir;
-        protected $data = [];
         protected static $handlers = [];
         
         public function __construct($data = null) {
