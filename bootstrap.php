@@ -8,7 +8,7 @@ use \slash\Path;
 \trait_exists('\\traits\\Data') or require \dirname(__DIR__) . '/traits/Data.php';
 \trait_exists('\\traits\\Mixin') or require \dirname(__DIR__) . '/traits/Mixin.php'; 
 \trait_exists('\\traits\\Emitter') or require \dirname(__DIR__) . '/traits/Emitter.php'; 
-\class_exists('\\slash\\Path') or require \dirname(__DIR__) . '/slash/Path.php';
+\class_exists('\\slash\\Path') or require \dirname(__DIR__) . '/slash/bootstrap.php';
 
 # we need this as a class
 if ( ! \class_exists('\\chromosome\\Emitter')) {

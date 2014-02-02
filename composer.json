@@ -10,7 +10,7 @@
     }],
     "require": {
         "php": ">=5.4",
-        "ryanve/slash": "*",
+        "ryanve/slash": "~3.0.0",
         "ryanve/traits": "~0.8.0"
     },
     "suggest": {
