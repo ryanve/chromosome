@@ -1,4 +1,4 @@
-<?php#emitter
+<?php
 namespace chromosome;
 use \slash\Path;
 require_once 'bootstrap.php';
@@ -51,16 +51,16 @@ if ( ! \class_exists(__NAMESPACE__ . '\\Chromosome')) {
             return \call_user_func_array([static::emitter(), 'on'], func_get_args());
         }
 
-        public static function on() {
-            return \call_user_func_array([static::emitter(), 'on'], func_get_args());
+        public static function off() {
+            return \call_user_func_array([static::emitter(), 'off'], func_get_args());
         }
-
-        public static function trigger($name, $scope = null) {
-            foreach (\preg_split('#\s+#', $name) as $n)
-                if ( ! empty(static::$handlers[$n]))
-                    foreach (static::$handlers[$n] as $fn)
-                        if (false === static::apply($fn, $scope))
-                            break;
+        
+        public static function emit() {
+            return \call_user_func_array([static::emitter(), 'emit'], func_get_args());
+        }
+        
+        public static function trigger() {
+            return \call_user_func_array([static::emitter(), 'trigger'], func_get_args());
         }
         
         public static function blast($name, $scope = null) {
